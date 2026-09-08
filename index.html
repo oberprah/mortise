@@ -3,15 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f4f6f9">
+<meta name="color-scheme" content="light">
 <title>Möbelkalkulation</title>
 <style>
   :root {
-    --bg: #f8fafc;
+    color-scheme: light;
+    --bg: #f4f6f9;
     --surface: #ffffff;
     --fg: #0f172a;
     --muted: #64748b;
     --muted-soft: #94a3b8;
-    --line: #e2e8f0;
+    --line: #e6e9ef;
     --line-strong: #cbd5e1;
     --accent: #334155;
     --accent-soft: #f1f5f9;
@@ -26,45 +29,141 @@
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
-    background: var(--bg); color: var(--fg);
+    color: var(--fg);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 14px; line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
-  body { padding-bottom: 40px; }
+  body {
+    background: var(--bg);
+    min-height: 100vh;
+  }
 
-  /* ---- Topbar: title + tools ---- */
-  .topbar {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: saturate(180%) blur(10px);
+  /* ---- App shell: sidebar + main ---- */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 248px; flex-shrink: 0;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; height: 100vh;
+    padding: 16px 12px;
+    z-index: 200;
+  }
+  .sidebar-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 6px 12px;
+  }
+  .sidebar-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--muted);
+  }
+  .icon-btn {
+    width: 26px; height: 26px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+    background: #fff; color: var(--accent); cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .icon-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .icon-btn svg { width: 14px; height: 14px; display: block; }
+
+  .project-list {
+    flex: 1; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 2px;
+    margin: 0 -4px; padding: 0 4px;
+  }
+  .project-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 8px;
+    cursor: pointer; color: var(--fg); font-weight: 500;
+    border: 1px solid transparent; transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+  .project-item:hover { background: #e6eaf1; }
+  .project-item.active { background: #e0e6ef; color: var(--ink); font-weight: 600; }
+  .project-item.active:hover { background: #d8dfeb; }
+  .project-item .pname {
+    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .project-item .pdel { display: none; }
+
+  .storage-info {
+    padding: 6px 10px 4px;
+    margin-top: 4px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .storage-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--muted-soft);
+  }
+  .storage-val {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sidebar-foot { padding-top: 10px; margin-top: 8px; }
+  .settings-btn {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border: 1px solid transparent; border-radius: 8px;
+    background: none; color: var(--fg); font: inherit; font-weight: 600;
+    cursor: pointer; transition: background 0.12s, border-color 0.12s;
+  }
+  .settings-btn:hover { background: #e6eaf1; border-color: var(--line); }
+  .settings-btn.active { background: #e0e6ef; border-color: var(--line-strong); }
+  .settings-btn svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); }
+
+  .main {
+    flex: 1; min-width: 0;
+    margin-left: 248px;
+    padding: 16px 16px 16px 8px;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+  .card {
+    flex: 1; min-width: 0;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 12px 32px rgba(15,23,42,0.05);
+    padding: 22px 28px 32px;
+    overflow-y: auto;
+  }
+
+  /* ---- Card header (project + settings) ---- */
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding-bottom: 18px; margin-bottom: 22px;
     border-bottom: 1px solid var(--line);
   }
-  .topbar-inner {
-    max-width: 1080px; margin: 0 auto;
-    padding: 14px 28px;
-    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  .menu-btn {
+    display: none; width: 32px; height: 32px; padding: 0;
+    align-items: center; justify-content: center;
+    border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+    background: #fff; cursor: pointer; color: var(--accent);
   }
+  .menu-btn:hover { background: var(--accent-soft); }
   .projekt-name {
-    font-size: 20px; font-weight: 700; letter-spacing: -0.015em;
-    color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60vw;
+    flex: 1; min-width: 0;
+    font-size: 22px; font-weight: 700; letter-spacing: -0.015em;
+    color: var(--ink); background: transparent; border: 1px solid transparent;
+    border-radius: var(--radius-sm); padding: 6px 8px;
+    transition: border-color 0.12s, background 0.12s;
   }
-  .projekt-name.empty { color: var(--muted-soft); font-weight: 500; }
-  .topbar-right { display: flex; align-items: center; gap: 14px; }
-  .topbar-total { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .projekt-name:hover { border-color: var(--line); background: var(--accent-soft); }
+  .projekt-name:focus { outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
+  .card-head-total { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; }
   .endpreis-label {
     font-size: 10px; color: var(--muted); text-transform: uppercase;
     letter-spacing: 0.1em; font-weight: 600;
   }
   .endpreis-val {
-    font-size: 24px; font-weight: 800; color: var(--ink);
-    font-variant-numeric: tabular-nums; letter-spacing: -0.015em; line-height: 1.1;
+    font-size: 26px; font-weight: 800; color: var(--ink);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1.1;
   }
-  .topbar-divider { width: 1px; height: 28px; background: var(--line); }
-  .topbar-tools { display: flex; gap: 6px; }
 
-  /* ---- Layout ---- */
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 28px 40px; }
+  .settings-head-row { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+  .settings-title { font-size: 20px; font-weight: 700; letter-spacing: -0.015em; color: var(--ink); }
+
+  /* ---- Sections / headings ---- */
   h2 {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.12em; color: var(--muted); margin: 0 0 16px;
@@ -98,7 +197,6 @@
 
   /* ---- Möbel cards ---- */
   .moebel-list { display: flex; flex-direction: column; gap: 12px; }
-  .moebel-head { display: none; }
   .moebel-row {
     background: var(--surface); border: 1px solid var(--line);
     border-radius: var(--radius); padding: 16px 18px;
@@ -157,7 +255,6 @@
     font-size: 10px; color: var(--muted-soft); text-transform: uppercase;
     letter-spacing: 0.04em; font-weight: 600;
   }
-  .moebel-prices-inline .sep { display: none; }
 
   /* ---- Zusätze ---- */
   .zusatz-list {
@@ -166,7 +263,7 @@
     border: 1px solid var(--line);
   }
   .zusatz-head {
-    display: grid; grid-template-columns: minmax(150px, 1.4fr) minmax(96px, 120px) 96px 24px;
+    display: grid; grid-template-columns: minmax(150px,1.4fr) minmax(96px,120px) 96px 24px;
     gap: 9px; align-items: center; padding: 0 0 6px;
     border-bottom: 1px solid var(--line); margin-bottom: 4px;
   }
@@ -176,7 +273,7 @@
   }
   .zusatz-head .sum-head { text-align: right; }
   .zusatz-row {
-    display: grid; grid-template-columns: minmax(150px, 1.4fr) minmax(96px, 120px) 96px 24px;
+    display: grid; grid-template-columns: minmax(150px,1.4fr) minmax(96px,120px) 96px 24px;
     gap: 9px; align-items: center; padding: 4px 0;
   }
   .zusatz-row select, .zusatz-row input { background: #fff; }
@@ -228,9 +325,6 @@
   }
   .add-moebel-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
 
-  /* ---- Tools (hidden — moved to topbar) ---- */
-  .tools { display: none; }
-
   /* ---- Buttons ---- */
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -245,13 +339,12 @@
   .btn.secondary { background: #fff; color: var(--accent); }
   .btn.sm { padding: 6px 12px; font-size: 12px; }
 
-  /* ---- Overview card (at the bottom of the layout) ---- */
+  /* ---- Summary ---- */
   .summary {
     margin-top: 24px;
     display: flex; align-items: center; justify-content: flex-end; gap: 36px;
     padding: 20px 24px;
-    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    background: var(--accent-soft); border: 1px solid var(--line); border-radius: var(--radius);
     flex-wrap: wrap;
   }
   .summary .cell { text-align: right; }
@@ -272,25 +365,30 @@
     display: flex; gap: 8px; flex-wrap: wrap; width: 100%;
   }
 
-  /* ---- Config panel (Möbeltypen editor) ---- */
+  /* ---- Config panel (project-local Möbeltypen editor) ---- */
   .config-panel {
-    margin-top: 40px;
+    margin-top: 32px;
     border: 1px solid var(--line); border-radius: var(--radius);
     overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm);
   }
   .config-panel-head {
     padding: 14px 20px; background: var(--accent-soft);
     border-bottom: 1px solid var(--line);
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
     cursor: pointer; user-select: none;
   }
   .config-panel-head h2 {
     margin: 0; color: var(--accent); font-size: 11px;
     text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .config-panel-head h2 .config-sub {
+    font-weight: 500; color: var(--muted-soft); font-size: 11px;
+    text-transform: none; letter-spacing: 0;
   }
   .config-panel-head .toggle { font-size: 12px; color: var(--muted); font-weight: 600; }
   .config-panel-body { padding: 16px 20px 20px; }
-  .hint { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+  .hint { font-size: 12px; color: var(--muted); margin: 0 0 14px; line-height: 1.55; }
 
   .typ-block {
     border: 1px solid var(--line); border-radius: var(--radius-sm);
@@ -328,9 +426,15 @@
   .mini-add-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
   .typ-actions { display: flex; gap: 8px; margin-top: 8px; }
 
+  /* ---- Empty state ---- */
+  .empty-state { text-align: center; padding: 72px 28px; }
+  .empty-inner { max-width: 360px; margin: 0 auto; }
+  .empty-title { font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .empty-sub { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+
   /* ---- Modal ---- */
   .modal-overlay {
-    position: fixed; inset: 0; z-index: 200;
+    position: fixed; inset: 0; z-index: 300;
     background: rgba(15,23,42,0.4); display: flex;
     align-items: center; justify-content: center;
   }
@@ -350,84 +454,142 @@
   .modal input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
   .modal-actions { display: flex; gap: 8px; margin-top: 22px; justify-content: flex-end; flex-wrap: wrap; }
 
-  @media (max-width: 720px) {
-    .topbar-tools { display: none; }
-    .topbar-divider { display: none; }
+  .scrim {
+    display: none; position: fixed; inset: 0; z-index: 150;
+    background: rgba(15,23,42,0.32);
+  }
+
+  @media (max-width: 860px) {
+    .sidebar {
+      transform: translateX(-100%); transition: transform 0.2s ease;
+      box-shadow: 0 0 40px rgba(15,23,42,0.18);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .scrim.show { display: block; }
+    .menu-btn { display: inline-flex; }
+    .main { margin-left: 0; padding: 12px; }
+    .card { padding: 18px 16px 24px; border-radius: 12px; }
+    .card-head { flex-wrap: wrap; }
+    .projekt-name { font-size: 19px; }
+    .endpreis-val { font-size: 22px; }
+  }
+  @media (max-width: 560px) {
     .summary { gap: 20px; }
     .summary .cell.final .val { font-size: 22px; }
     .moebel-top .typ-field { flex: 1 1 100%; }
   }
 
-  /* ---- Print: hide interactive chrome, keep the estimate readable ---- */
+  /* ---- Print ---- */
   @media print {
-    .topbar, .add-moebel-btn, .add-zusatz-btn, .del-x,
-    .config-panel, .summary-tools, .moebel-prices-inline { display: none !important; }
-    body { background: #fff; padding: 0; }
-    .wrap { max-width: none; padding: 0; }
+    .sidebar, .scrim, .menu-btn, .add-moebel-btn, .add-zusatz-btn, .del-x,
+    .config-panel, .summary-tools, .moebel-prices-inline, .settings-view, .empty-state { display: none !important; }
+    body { background: #fff; }
+    .main { margin-left: 0; padding: 0; }
+    .card { box-shadow: none; border: none; border-radius: 0; }
     .moebel-row { box-shadow: none; border-color: #cbd5e1; }
     .bez-input { border: none; padding: 0; }
     .collapse-btn { display: none !important; }
     .moebel-row.eingeklappt .moebel-detail,
     .moebel-row.eingeklappt .zusatz-list { display: revert !important; }
-    .typ-block.eingeklappt .typ-section { display: revert !important; }
   }
 </style>
 </head>
 <body>
-<div class="topbar">
-  <div class="topbar-inner">
-    <span class="projekt-name" id="projektNameDisplay">Wohnungseinrichtung</span>
-    <div class="topbar-right">
-      <div class="topbar-total">
-        <span class="endpreis-label">Endpreis brutto</span>
-        <span class="endpreis-val" id="tEndpreisHeader">0,00 &euro;</span>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <span class="sidebar-title">Projekte</span>
+      <button class="icon-btn" id="newProjectBtn" title="Neues Projekt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+    </div>
+    <div class="project-list" id="projectList"></div>
+    <div class="sidebar-foot">
+      <button class="settings-btn" id="settingsBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Einstellungen
+      </button>
+      <div class="storage-info">
+        <span class="storage-label">Speicher</span>
+        <span class="storage-val" id="storageVal">—</span>
       </div>
-      <div class="topbar-divider"></div>
-      <div class="topbar-tools">
-        <button class="btn sm" id="neuBtn">Neu</button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+    <!-- Project view -->
+    <div class="card" id="projectView">
+      <div class="card-head">
+        <button class="menu-btn" id="menuBtn" title="Menü">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <input type="text" class="projekt-name" id="projektNameInput" placeholder="Projektname">
+        <div class="card-head-total">
+          <span class="endpreis-label">Endpreis brutto</span>
+          <span class="endpreis-val" id="tEndpreisHeader">0,00 &euro;</span>
+        </div>
+        <button class="btn sm" id="deleteProjectBtn" title="Projekt löschen">Löschen</button>
+      </div>
+
+      <section>
+        <h2>M&ouml;bel <span class="count" id="moebelCount"></span></h2>
+        <div class="moebel-list" id="moebelList"></div>
+        <button class="add-moebel-btn" id="addMoebelBtn">+ M&ouml;bel hinzuf&uuml;gen</button>
+      </section>
+
+      <div class="config-panel">
+        <div class="config-panel-head" id="configToggle">
+          <h2>M&ouml;beltypen <span class="config-sub">(dieses Projekt)</span></h2>
+          <span class="toggle" id="configHint">anzeigen &#9662;</span>
+        </div>
+        <div class="config-panel-body" id="configBody" style="display:none;">
+          <p class="hint">Diese Typen gelten nur f&uuml;r dieses Projekt. Beim Anlegen wird eine Kopie der globalen Einstellungen &uuml;bernommen; hier kannst du sie projektspezifisch anpassen (z.&nbsp;B. Sonderrpreise f&uuml;r diesen Kunden). Mit &bdquo;Aus globalen Einstellungen neu laden&rdquo; &uuml;berschreibst du alle &Auml;nderungen wieder mit der aktuellen Vorlage.</p>
+          <div id="typEdit"></div>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="cell">
+          <label>Netto</label>
+          <div class="val" id="tNetto">0,00 &euro;</div>
+        </div>
+        <div class="cell">
+          <span class="mwst-label" id="mwstLabel">MwSt. 22%</span>
+          <div class="val" id="tMwstBetrag">0,00 &euro;</div>
+        </div>
+        <div class="cell final">
+          <label>Endpreis brutto</label>
+          <div class="val" id="tEndpreis">0,00 &euro;</div>
+        </div>
+        <div class="summary-tools">
+          <button class="btn primary" id="printPdfBtn">PDF</button>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="wrap">
-  <section>
-    <h2>M&ouml;bel <span class="count" id="moebelCount"></span></h2>
-    <div class="moebel-list" id="moebelList"></div>
-    <button class="add-moebel-btn" id="addMoebelBtn">+ M&ouml;bel hinzuf&uuml;gen</button>
-  </section>
+    <!-- Settings view -->
+    <div class="card settings-view" id="settingsView" style="display:none">
+      <div class="card-head">
+        <div class="settings-head-row">
+          <button class="menu-btn" id="menuBtn2" title="Menü">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <button class="btn sm" id="settingsBackBtn">&larr; Zur&uuml;ck</button>
+          <span class="settings-title">Einstellungen &mdash; M&ouml;beltypen</span>
+        </div>
+      </div>
+      <p class="hint">Diese Typen sind die Vorlage f&uuml;r neue Projekte. Jedes Projekt erh&auml;lt bei der Erstellung eine eigene Kopie, die sich dann pro Projekt anpassen l&auml;sst. &Auml;nderungen hier wirken sich nicht auf bestehende Projekte aus.</p>
+      <div id="typEditGlobal"></div>
+    </div>
 
-  <div class="config-panel">
-    <div class="config-panel-head" id="configToggle">
-      <h2>M&ouml;beltypen</h2>
-      <span class="toggle" id="configHint">anzeigen &#9662;</span>
+    <!-- Empty state -->
+    <div class="card empty-state" id="emptyView" style="display:none">
+      <div class="empty-inner">
+        <div class="empty-title">Kein Projekt ausgew&auml;hlt</div>
+        <div class="empty-sub">Lege &uuml;ber die Sidebar links ein neues Projekt an, um zu beginnen.</div>
+        <button class="btn primary" id="emptyNewBtn">+ Neues Projekt</button>
+      </div>
     </div>
-    <div class="config-panel-body" id="configBody" style="display:none;">
-      <p class="hint">Typen, Komponenten und Zus&auml;tze hier anpassen &mdash; alle Berechnungen und Dropdown-Bezeichnungen aktualisieren sich live.</p>
-      <div id="typEdit"></div>
-    </div>
-  </div>
-
-  <div class="summary">
-    <div class="cell">
-      <label>Netto</label>
-      <div class="val" id="tNetto">0,00 &euro;</div>
-    </div>
-    <div class="cell">
-      <span class="mwst-label" id="mwstLabel">MwSt. 22%</span>
-      <div class="val" id="tMwstBetrag">0,00 &euro;</div>
-    </div>
-    <div class="cell final">
-      <label>Endpreis brutto</label>
-      <div class="val" id="tEndpreis">0,00 &euro;</div>
-    </div>
-    <div class="summary-tools">
-      <button class="btn" id="exportJsonBtn">JSON exportieren</button>
-      <button class="btn" id="importJsonBtn">JSON importieren</button>
-      <button class="btn primary" id="printPdfBtn">Drucken / PDF</button>
-      <input type="file" id="importFile" accept=".json,application/json" style="display:none">
-    </div>
-  </div>
+  </main>
 </div>
 
 <div class="modal-overlay" id="neuModal" style="display:none">
@@ -437,7 +599,6 @@
     <input type="text" id="neuNameInput">
     <div class="modal-actions">
       <button class="btn" id="neuCancel">Abbrechen</button>
-      <button class="btn secondary" id="neuImport">Bestehendes importieren</button>
       <button class="btn primary" id="neuStart">Starten</button>
     </div>
   </div>
@@ -545,50 +706,67 @@
   ];
 
   const STORAGE_CATALOG = "mortise.catalog";
-  const STORAGE_PROJECT = "mortise.project";
+  const STORAGE_PROJECTS = "mortise.projects";
+  const STORAGE_ACTIVE = "mortise.activeProjectId";
   const STORAGE_TYP_COLLAPSE = "mortise.typCollapse";
+  const LEGACY_PROJECT = "mortise.project";
 
-  let moebelTypen = [];
-  let projektName = "Wohnungseinrichtung";
-  let mwstPct = 22;
-  let moebel = [];
+  let globalTypen = [];
+  let projects = [];
+  let activeProjectId = null;
+  let view = "project";
   let eingeklappteTypen = new Set();
 
   function uid() {
     return "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
 
-  function loadCatalog() {
+  function activeProject() {
+    return projects.find(p => p.id === activeProjectId) || null;
+  }
+  function projektTypen() {
+    const p = activeProject();
+    return p ? p.moebelTypen : [];
+  }
+
+  function loadJSON(key) {
     try {
-      const raw = localStorage.getItem(STORAGE_CATALOG);
+      const raw = localStorage.getItem(key);
       if (raw) return JSON.parse(raw);
     } catch (e) {}
     return null;
   }
-  function saveCatalog() {
-    try { localStorage.setItem(STORAGE_CATALOG, JSON.stringify(moebelTypen)); } catch (e) {}
+  function saveJSON(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
   }
-  function loadProject() {
-    try {
-      const raw = localStorage.getItem(STORAGE_PROJECT);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    return null;
-  }
-  function saveProject() {
-    try {
-      localStorage.setItem(STORAGE_PROJECT, JSON.stringify({ projektName: projektName, mwstPct: mwstPct, moebel: moebel }));
-    } catch (e) {}
-  }
+
+  function saveCatalog() { saveJSON(STORAGE_CATALOG, globalTypen); renderStorageInfo(); }
+  function saveProjects() { saveJSON(STORAGE_PROJECTS, projects); renderStorageInfo(); }
+  function saveActive() { saveJSON(STORAGE_ACTIVE, activeProjectId || ""); }
+  function saveProject() { saveProjects(); saveActive(); }
+  function saveTypCollapse() { saveJSON(STORAGE_TYP_COLLAPSE, Array.from(eingeklappteTypen)); }
   function loadTypCollapse() {
-    try {
-      const raw = localStorage.getItem(STORAGE_TYP_COLLAPSE);
-      if (raw) return new Set(JSON.parse(raw));
-    } catch (e) {}
-    return new Set();
+    const arr = loadJSON(STORAGE_TYP_COLLAPSE);
+    return Array.isArray(arr) ? new Set(arr) : new Set();
   }
-  function saveTypCollapse() {
-    try { localStorage.setItem(STORAGE_TYP_COLLAPSE, JSON.stringify(Array.from(eingeklappteTypen))); } catch (e) {}
+
+  function storageBytes() {
+    let total = 0;
+    [STORAGE_CATALOG, STORAGE_PROJECTS, STORAGE_ACTIVE, STORAGE_TYP_COLLAPSE].forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v) total += v.length + k.length;
+    });
+    return total;
+  }
+  function renderStorageInfo() {
+    const el = document.getElementById("storageVal");
+    if (!el) return;
+    const bytes = storageBytes();
+    const limit = 5 * 1024 * 1024;
+    const kb = (bytes / 1024).toFixed(1);
+    const pct = (bytes / limit * 100).toFixed(1);
+    el.textContent = kb + " KB (" + pct + "%)";
+    el.style.color = pct > 80 ? "#dc2626" : pct > 50 ? "#b45309" : "var(--muted)";
   }
 
   function normalizeTyp(t) {
@@ -612,7 +790,7 @@
     return { name: String(z.name || ""), mengeArt: MENGE_ARTEN.some(a => a.value === art) ? art : "stueck", preis: Number(z.preis) || 0 };
   }
 
-  function findTyp(id) { return moebelTypen.find(t => t.id === id) || null; }
+  function findTyp(id) { return projektTypen().find(t => t.id === id) || null; }
   function findOption(comp, name) { return (comp.optionen || []).find(o => o.name === name) || null; }
   function findZusatzDef(typ, name) { return (typ.zusaetze || []).find(z => z.name === name) || null; }
   function einheitForMengetArt(art) {
@@ -626,17 +804,12 @@
     if (n === null || n === undefined || isNaN(n)) n = 0;
     return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
   }
-  function fmtNum(n) {
-    if (n === null || n === undefined || isNaN(n)) n = 0;
-    return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-  function sanitizeFilename(s) { return String(s).replace(/[^a-zA-Z0-9_-]+/g, "_"); }
   function escapeHtml(s) {
     if (s === null || s === undefined) return "";
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  function migrateComponentName(typId, oldName, newName) {
+  function migrateComponentName(moebel, typId, oldName, newName) {
     if (!oldName || oldName === newName) return;
     moebel.forEach(m => {
       if (m.typId !== typId || !m.komponenten) return;
@@ -646,14 +819,14 @@
       }
     });
   }
-  function migrateOptionName(typId, compName, oldName, newName) {
+  function migrateOptionName(moebel, typId, compName, oldName, newName) {
     if (!oldName || oldName === newName) return;
     moebel.forEach(m => {
       if (m.typId !== typId || !m.komponenten) return;
       if (m.komponenten[compName] === oldName) m.komponenten[compName] = newName;
     });
   }
-  function migrateZusatzName(typId, oldName, newName) {
+  function migrateZusatzName(moebel, typId, oldName, newName) {
     if (!oldName || oldName === newName) return;
     moebel.forEach(m => {
       if (m.typId !== typId) return;
@@ -670,8 +843,31 @@
     return out;
   }
 
-  function initData() {
-    moebel = [
+  function importMoebel(m) {
+    const typId = m.typId || "schrank";
+    let komponenten = {};
+    if (m.komponenten && typeof m.komponenten === "object") komponenten = Object.assign({}, m.komponenten);
+    if (m.korpus !== undefined) {
+      let v = String(m.korpus);
+      if (v.indexOf("Korpus ") === 0) v = v.slice(7);
+      komponenten["Korpus"] = v;
+    }
+    if (m.front !== undefined) komponenten["Front"] = String(m.front);
+    return {
+      id: m.id || uid(),
+      typId: String(typId),
+      bezeichnung: String(m.bezeichnung || ""),
+      qm: Number(m.qm) || 0,
+      komponenten: komponenten,
+      zusaetze: Array.isArray(m.zusaetze)
+        ? m.zusaetze.map(z => ({ id: z.id || uid(), name: String(z.name || ""), menge: Number(z.menge) || 0 }))
+        : [],
+      eingeklappt: !!m.eingeklappt
+    };
+  }
+
+  function seedDemoMoebel() {
+    return [
       {
         id: uid(), typId: "schrank", bezeichnung: "Küchenunterschrank", qm: 3.2,
         komponenten: { Korpus: "Dekor", Front: "Farblack" },
@@ -684,9 +880,7 @@
       {
         id: uid(), typId: "schrank", bezeichnung: "Sideboard Wohnzimmer", qm: 2.8,
         komponenten: { Korpus: "Furnier", Front: "Massivholz" },
-        zusaetze: [
-          { id: uid(), name: "Innenschublade L", menge: 2 }
-        ]
+        zusaetze: [ { id: uid(), name: "Innenschublade L", menge: 2 } ]
       },
       {
         id: uid(), typId: "decke", bezeichnung: "Akustikdecke Wohnzimmer", qm: 24,
@@ -697,6 +891,16 @@
         ]
       }
     ];
+  }
+
+  function newProject(name) {
+    return {
+      id: uid(),
+      name: name || "Neues Projekt",
+      mwstPct: 22,
+      moebel: [],
+      moebelTypen: JSON.parse(JSON.stringify(globalTypen))
+    };
   }
 
   function calcMoebel(m) {
@@ -733,9 +937,11 @@
   }
 
   function calc() {
+    const p = activeProject();
+    const mwstPct = p ? p.mwstPct : 22;
     let moebelGesamt = 0;
     let zusaetzeGesamt = 0;
-    moebel.forEach(m => {
+    (p ? p.moebel : []).forEach(m => {
       const c = calcMoebel(m);
       m._calc = c;
       moebelGesamt += c.gesamt;
@@ -744,14 +950,16 @@
     const netto = moebelGesamt;
     const mwstBetrag = netto * mwstPct / 100;
     const endpreis = netto + mwstBetrag;
-    return { moebelGesamt: moebelGesamt, zusaetzeGesamt: zusaetzeGesamt, netto: netto, mwstPct: mwstPct, mwstBetrag: mwstBetrag, endpreis: endpreis };
+    return { netto: netto, mwstPct: mwstPct, mwstBetrag: mwstBetrag, endpreis: endpreis };
   }
 
   function renderMoebel() {
     const list = document.getElementById("moebelList");
     list.innerHTML = "";
-    moebel.forEach(m => list.appendChild(renderMoebelCard(m)));
-    document.getElementById("moebelCount").textContent = moebel.length ? moebel.length + " Stück" : "";
+    const p = activeProject();
+    if (!p) return;
+    p.moebel.forEach(m => list.appendChild(renderMoebelCard(m)));
+    document.getElementById("moebelCount").textContent = p.moebel.length ? p.moebel.length + " Stück" : "";
     renderEndpreis();
   }
 
@@ -771,7 +979,8 @@
     row.dataset.id = m.id;
     if (m.eingeklappt) row.classList.add("eingeklappt");
 
-    const typeOpts = moebelTypen.map(t =>
+    const typen = projektTypen();
+    const typeOpts = typen.map(t =>
       `<option value="${escapeHtml(t.id)}"${t.id === m.typId ? " selected" : ""}>${escapeHtml(t.name || t.id)}</option>`
     ).join("");
     const typSelect = typ
@@ -838,9 +1047,7 @@
       addBtn.textContent = "+ Zusatz";
       addBtn.addEventListener("click", () => {
         const first = typ.zusaetze[0];
-        const def = first || null;
-        const menge = def && def.mengeArt === "pauschal" ? 1 : 1;
-        const z = { id: uid(), name: first ? first.name : "", menge: menge };
+        const z = { id: uid(), name: first ? first.name : "", menge: 1 };
         m.zusaetze.push(z);
         saveProject();
         renderMoebel();
@@ -854,7 +1061,9 @@
       el.addEventListener("change", onMoebelInput);
     });
     row.querySelector('[data-act="del-moebel"]').addEventListener("click", () => {
-      moebel = moebel.filter(x => x.id !== m.id);
+      const p = activeProject();
+      if (!p) return;
+      p.moebel = p.moebel.filter(x => x.id !== m.id);
       saveProject();
       renderMoebel();
     });
@@ -917,12 +1126,14 @@
   function findMoebelByZusatzRow(row) {
     const moebelRow = row.closest(".moebel-row");
     const id = moebelRow.dataset.id;
-    return moebel.find(m => m.id === id);
+    const p = activeProject();
+    return p ? p.moebel.find(m => m.id === id) : null;
   }
 
   function onMoebelInput(e) {
     const row = e.target.closest(".moebel-row");
-    const m = moebel.find(x => x.id === row.dataset.id);
+    const p = activeProject();
+    const m = p ? p.moebel.find(x => x.id === row.dataset.id) : null;
     if (!m) return;
     const f = e.target.dataset.f;
     if (f === "bezeichnung") m.bezeichnung = e.target.value;
@@ -1009,31 +1220,93 @@
   }
 
   function renderProjektName() {
-    const el = document.getElementById("projektNameDisplay");
-    const txt = (projektName || "").trim();
-    if (txt) { el.textContent = txt; el.className = "projekt-name"; }
-    else { el.textContent = "Unbenanntes Projekt"; el.className = "projekt-name empty"; }
+    const el = document.getElementById("projektNameInput");
+    const p = activeProject();
+    el.value = p ? (p.name || "") : "";
+    el.disabled = !p;
   }
 
   function renderMwstLabel() {
-    document.getElementById("mwstLabel").textContent = "MwSt. " + mwstPct + "%";
+    const p = activeProject();
+    document.getElementById("mwstLabel").textContent = "MwSt. " + (p ? p.mwstPct : 22) + "%";
   }
 
-  function renderTypeEditor() {
-    const container = document.getElementById("typEdit");
+  function renderProjectList() {
+    const list = document.getElementById("projectList");
+    list.innerHTML = "";
+    projects.forEach(p => {
+      const item = document.createElement("div");
+      item.className = "project-item" + (p.id === activeProjectId ? " active" : "");
+      item.dataset.id = p.id;
+      const name = document.createElement("span");
+      name.className = "pname";
+      name.textContent = p.name || "Unbenanntes Projekt";
+      const del = document.createElement("button");
+      del.className = "pdel";
+      del.innerHTML = "&times;";
+      del.title = "Projekt löschen";
+      del.addEventListener("click", (e) => { e.stopPropagation(); deleteProject(p.id); });
+      item.appendChild(name);
+      item.appendChild(del);
+      item.addEventListener("click", () => switchProject(p.id));
+      list.appendChild(item);
+    });
+  }
+
+  function showView(v) {
+    view = v;
+    document.getElementById("projectView").style.display = v === "project" ? "" : "none";
+    document.getElementById("settingsView").style.display = v === "settings" ? "" : "none";
+    document.getElementById("emptyView").style.display = v === "empty" ? "" : "none";
+    document.getElementById("settingsBtn").classList.toggle("active", v === "settings");
+    closeSidebar();
+  }
+
+  function switchProject(id) {
+    activeProjectId = id;
+    saveActive();
+    renderProjectList();
+    renderProjektName();
+    renderMwstLabel();
+    renderProjectTypeEditor();
+    renderMoebel();
+    showView(activeProject() ? "project" : "empty");
+  }
+
+  function deleteProject(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    if (!confirm(`Projekt „${p.name || ""}“ löschen?`)) return;
+    projects = projects.filter(x => x.id !== id);
+    if (activeProjectId === id) {
+      activeProjectId = projects.length ? projects[projects.length - 1].id : null;
+    }
+    saveProjects();
+    saveActive();
+    renderProjectList();
+    if (activeProject()) switchProject(activeProjectId);
+    else { showView("empty"); renderProjektName(); renderMoebel(); }
+  }
+
+  /* ---- Type editor (shared by global settings + project panel) ---- */
+  function makeEditorCtx(typen, moebel, onSave, onChange, onReset, resetLabel) {
+    return { typen: typen, moebel: moebel, onSave: onSave, onChange: onChange, onReset: onReset, resetLabel: resetLabel };
+  }
+
+  function renderTypeEditor(container, ctx) {
     container.innerHTML = "";
-    moebelTypen.forEach(typ => container.appendChild(renderTypBlock(typ)));
+    ctx.typen.forEach(typ => container.appendChild(renderTypBlock(typ, ctx)));
 
     const actions = document.createElement("div");
     actions.className = "typ-actions";
     const addBtn = document.createElement("button");
     addBtn.className = "btn sm";
     addBtn.textContent = "+ Möbeltyp";
-    addBtn.addEventListener("click", addTyp);
+    addBtn.addEventListener("click", () => addTyp(ctx));
     const resetBtn = document.createElement("button");
     resetBtn.className = "btn sm secondary";
-    resetBtn.textContent = "Auf Standard zurücksetzen";
-    resetBtn.addEventListener("click", resetCatalog);
+    resetBtn.textContent = ctx.resetLabel;
+    resetBtn.addEventListener("click", ctx.onReset);
     actions.appendChild(addBtn);
     actions.appendChild(resetBtn);
     container.appendChild(actions);
@@ -1046,7 +1319,7 @@
     return el;
   }
 
-  function renderTypBlock(typ) {
+  function renderTypBlock(typ, ctx) {
     const block = document.createElement("div");
     block.className = "typ-block";
     block.dataset.tid = typ.id;
@@ -1074,8 +1347,8 @@
     nameInp.className = "typ-name";
     nameInp.addEventListener("input", () => {
       typ.name = nameInp.value;
-      saveCatalog();
-      renderMoebel();
+      ctx.onSave();
+      ctx.onChange();
     });
     const delBtn = document.createElement("button");
     delBtn.className = "del-x";
@@ -1083,12 +1356,13 @@
     delBtn.title = "Typ löschen";
     delBtn.addEventListener("click", () => {
       if (!confirm(`Möbeltyp „${typ.name || ""}“ löschen?`)) return;
-      moebelTypen = moebelTypen.filter(t => t.id !== typ.id);
+      const idx = ctx.typen.indexOf(typ);
+      if (idx >= 0) ctx.typen.splice(idx, 1);
       eingeklappteTypen.delete(typ.id);
       saveTypCollapse();
-      saveCatalog();
-      renderTypeEditor();
-      renderMoebel();
+      ctx.onSave();
+      rerenderEditor(ctx);
+      ctx.onChange();
     });
     head.appendChild(collapseBtn);
     head.appendChild(nameInp);
@@ -1098,15 +1372,15 @@
     const compSection = document.createElement("div");
     compSection.className = "typ-section";
     compSection.appendChild(sectionLabel("Komponenten"));
-    (typ.komponenten || []).forEach(comp => compSection.appendChild(renderCompBlock(typ, comp)));
+    (typ.komponenten || []).forEach(comp => compSection.appendChild(renderCompBlock(typ, comp, ctx)));
     const addCompBtn = document.createElement("button");
     addCompBtn.className = "mini-add-btn";
     addCompBtn.textContent = "+ Komponente";
     addCompBtn.addEventListener("click", () => {
       typ.komponenten.push({ name: "Neue Komponente", optionen: [] });
-      saveCatalog();
-      renderTypeEditor();
-      renderMoebel();
+      ctx.onSave();
+      rerenderEditor(ctx);
+      ctx.onChange();
     });
     compSection.appendChild(addCompBtn);
     block.appendChild(compSection);
@@ -1114,22 +1388,22 @@
     const zusSection = document.createElement("div");
     zusSection.className = "typ-section";
     zusSection.appendChild(sectionLabel("Zusätze"));
-    (typ.zusaetze || []).forEach(z => zusSection.appendChild(renderZusatzDefRow(typ, z)));
+    (typ.zusaetze || []).forEach(z => zusSection.appendChild(renderZusatzDefRow(typ, z, ctx)));
     const addZusBtn = document.createElement("button");
     addZusBtn.className = "mini-add-btn";
     addZusBtn.textContent = "+ Zusatz";
     addZusBtn.addEventListener("click", () => {
       typ.zusaetze.push({ name: "Neuer Zusatz", mengeArt: "stueck", preis: 0 });
-      saveCatalog();
-      renderTypeEditor();
-      renderMoebel();
+      ctx.onSave();
+      rerenderEditor(ctx);
+      ctx.onChange();
     });
     zusSection.appendChild(addZusBtn);
     block.appendChild(zusSection);
     return block;
   }
 
-  function renderCompBlock(typ, comp) {
+  function renderCompBlock(typ, comp, ctx) {
     const block = document.createElement("div");
     block.className = "comp-block";
     const head = document.createElement("div");
@@ -1141,9 +1415,9 @@
     nameInp.addEventListener("input", () => {
       const old = comp.name;
       comp.name = nameInp.value;
-      migrateComponentName(typ.id, old, comp.name);
-      saveCatalog();
-      renderMoebel();
+      if (ctx.moebel) migrateComponentName(ctx.moebel, typ.id, old, comp.name);
+      ctx.onSave();
+      ctx.onChange();
     });
     const delBtn = document.createElement("button");
     delBtn.className = "del-x";
@@ -1151,29 +1425,29 @@
     delBtn.title = "Komponente löschen";
     delBtn.addEventListener("click", () => {
       typ.komponenten = typ.komponenten.filter(c => c !== comp);
-      saveCatalog();
-      renderTypeEditor();
-      renderMoebel();
+      ctx.onSave();
+      rerenderEditor(ctx);
+      ctx.onChange();
     });
     head.appendChild(nameInp);
     head.appendChild(delBtn);
     block.appendChild(head);
 
-    (comp.optionen || []).forEach(opt => block.appendChild(renderOptionRow(typ, comp, opt)));
+    (comp.optionen || []).forEach(opt => block.appendChild(renderOptionRow(typ, comp, opt, ctx)));
     const addOptBtn = document.createElement("button");
     addOptBtn.className = "mini-add-btn";
     addOptBtn.textContent = "+ Option";
     addOptBtn.addEventListener("click", () => {
       comp.optionen.push({ name: "Neue Option", preis: 0 });
-      saveCatalog();
-      renderTypeEditor();
-      renderMoebel();
+      ctx.onSave();
+      rerenderEditor(ctx);
+      ctx.onChange();
     });
     block.appendChild(addOptBtn);
     return block;
   }
 
-  function renderOptionRow(typ, comp, opt) {
+  function renderOptionRow(typ, comp, opt, ctx) {
     const row = document.createElement("div");
     row.className = "opt-row";
     const nameInp = document.createElement("input");
@@ -1183,9 +1457,9 @@
     nameInp.addEventListener("input", () => {
       const old = opt.name;
       opt.name = nameInp.value;
-      migrateOptionName(typ.id, comp.name, old, opt.name);
-      saveCatalog();
-      renderMoebel();
+      if (ctx.moebel) migrateOptionName(ctx.moebel, typ.id, comp.name, old, opt.name);
+      ctx.onSave();
+      ctx.onChange();
     });
     const preisInp = document.createElement("input");
     preisInp.type = "number";
@@ -1194,8 +1468,8 @@
     preisInp.value = opt.preis;
     preisInp.addEventListener("input", () => {
       opt.preis = parseFloat(preisInp.value) || 0;
-      saveCatalog();
-      renderMoebel();
+      ctx.onSave();
+      ctx.onChange();
     });
     const delBtn = document.createElement("button");
     delBtn.className = "del-x";
@@ -1203,9 +1477,9 @@
     delBtn.title = "Option löschen";
     delBtn.addEventListener("click", () => {
       comp.optionen = comp.optionen.filter(o => o !== opt);
-      saveCatalog();
-      renderTypeEditor();
-      renderMoebel();
+      ctx.onSave();
+      rerenderEditor(ctx);
+      ctx.onChange();
     });
     row.appendChild(nameInp);
     row.appendChild(preisInp);
@@ -1213,7 +1487,7 @@
     return row;
   }
 
-  function renderZusatzDefRow(typ, z) {
+  function renderZusatzDefRow(typ, z, ctx) {
     const row = document.createElement("div");
     row.className = "zusatzdef-row";
     const nameInp = document.createElement("input");
@@ -1223,9 +1497,9 @@
     nameInp.addEventListener("input", () => {
       const old = z.name;
       z.name = nameInp.value;
-      migrateZusatzName(typ.id, old, z.name);
-      saveCatalog();
-      renderMoebel();
+      if (ctx.moebel) migrateZusatzName(ctx.moebel, typ.id, old, z.name);
+      ctx.onSave();
+      ctx.onChange();
     });
     const artSel = document.createElement("select");
     MENGE_ARTEN.forEach(a => {
@@ -1237,8 +1511,8 @@
     });
     artSel.addEventListener("change", () => {
       z.mengeArt = artSel.value;
-      saveCatalog();
-      renderMoebel();
+      ctx.onSave();
+      ctx.onChange();
     });
     const preisInp = document.createElement("input");
     preisInp.type = "number";
@@ -1247,8 +1521,8 @@
     preisInp.value = z.preis;
     preisInp.addEventListener("input", () => {
       z.preis = parseFloat(preisInp.value) || 0;
-      saveCatalog();
-      renderMoebel();
+      ctx.onSave();
+      ctx.onChange();
     });
     const delBtn = document.createElement("button");
     delBtn.className = "del-x";
@@ -1256,9 +1530,9 @@
     delBtn.title = "Zusatz löschen";
     delBtn.addEventListener("click", () => {
       typ.zusaetze = typ.zusaetze.filter(x => x !== z);
-      saveCatalog();
-      renderTypeEditor();
-      renderMoebel();
+      ctx.onSave();
+      rerenderEditor(ctx);
+      ctx.onChange();
     });
     row.appendChild(nameInp);
     row.appendChild(artSel);
@@ -1267,29 +1541,60 @@
     return row;
   }
 
-  function addTyp() {
+  function addTyp(ctx) {
     const t = { id: uid(), name: "", komponenten: [{ name: "Korpus", optionen: [] }], zusaetze: [] };
-    moebelTypen.push(t);
-    saveCatalog();
-    renderTypeEditor();
-    renderMoebel();
-    const inp = document.querySelector(`.typ-block[data-tid="${t.id}"] .typ-name`);
+    ctx.typen.push(t);
+    ctx.onSave();
+    rerenderEditor(ctx);
+    ctx.onChange();
+    const container = ctx === globalCtx() ? document.getElementById("typEditGlobal") : document.getElementById("typEdit");
+    const inp = container.querySelector(`.typ-block[data-tid="${t.id}"] .typ-name`);
     if (inp) inp.focus();
   }
 
-  function resetCatalog() {
-    if (!confirm("Möbeltypen auf Standard zurücksetzen? Eigene Änderungen gehen verloren. Das Projekt bleibt erhalten.")) return;
-    moebelTypen = JSON.parse(JSON.stringify(defaultMoebelTypen));
+  function rerenderEditor(ctx) {
+    if (ctx === globalCtx()) renderGlobalTypeEditor();
+    else renderProjectTypeEditor();
+  }
+
+  function globalCtx() {
+    return makeEditorCtx(globalTypen, null, saveCatalog, () => {}, resetGlobalCatalog, "Auf Standard zurücksetzen");
+  }
+  function projectCtx() {
+    const p = activeProject();
+    return makeEditorCtx(p ? p.moebelTypen : [], p ? p.moebel : [], saveProject, renderMoebel, reloadProjectFromGlobal, "Aus globalen Einstellungen neu laden");
+  }
+
+  function renderGlobalTypeEditor() {
+    renderTypeEditor(document.getElementById("typEditGlobal"), globalCtx());
+  }
+  function renderProjectTypeEditor() {
+    renderTypeEditor(document.getElementById("typEdit"), projectCtx());
+  }
+
+  function resetGlobalCatalog() {
+    if (!confirm("Möbeltypen auf Standard zurücksetzen? Eigene Änderungen gehen verloren. Bestehende Projekte bleiben unverändert.")) return;
+    globalTypen = JSON.parse(JSON.stringify(defaultMoebelTypen));
     saveCatalog();
-    renderTypeEditor();
+    renderGlobalTypeEditor();
+  }
+
+  function reloadProjectFromGlobal() {
+    if (!activeProject()) return;
+    if (!confirm("Aus globalen Einstellungen neu laden? Alle projektspezifischen Änderungen an den Möbeltypen gehen verloren.")) return;
+    activeProject().moebelTypen = JSON.parse(JSON.stringify(globalTypen));
+    saveProject();
+    renderProjectTypeEditor();
     renderMoebel();
   }
 
   function addMoebel() {
-    const typ = moebelTypen[0];
-    if (!typ) { alert("Bitte zuerst einen Möbeltyp anlegen."); return; }
+    const p = activeProject();
+    if (!p) return;
+    const typ = p.moebelTypen[0];
+    if (!typ) { alert("Bitte zuerst einen Möbeltyp anlegen (Einstellungen oder Projektspezifische Möbeltypen)."); return; }
     const m = { id: uid(), typId: typ.id, bezeichnung: "", qm: 0, komponenten: defaultKomponenten(typ), zusaetze: [] };
-    moebel.push(m);
+    p.moebel.push(m);
     saveProject();
     renderMoebel();
     focusMoebelBez(m.id);
@@ -1323,132 +1628,108 @@
   }
   function confirmNeu() {
     const name = document.getElementById("neuNameInput").value.trim() || "Neues Projekt";
-    projektName = name;
-    mwstPct = 22;
-    moebel = [];
-    closeNeuModal();
-    saveProject();
+    const p = newProject(name);
+    projects.push(p);
+    activeProjectId = p.id;
+    saveProjects();
+    saveActive();
+    renderProjectList();
     renderProjektName();
     renderMwstLabel();
+    renderProjectTypeEditor();
     renderMoebel();
-  }
-
-  function exportJson() {
-    const data = {
-      app: "moebelkalkulation",
-      version: 2,
-      projektName: projektName,
-      mwstPct: mwstPct,
-      moebelTypen: JSON.parse(JSON.stringify(moebelTypen)),
-      moebel: moebel.map(m => ({
-        id: m.id,
-        typId: m.typId,
-        bezeichnung: m.bezeichnung,
-        qm: m.qm,
-        komponenten: Object.assign({}, m.komponenten),
-        zusaetze: (m.zusaetze || []).map(z => ({ id: z.id, name: z.name, menge: z.menge }))
-      }))
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Moebelkalkulation_${sanitizeFilename(projektName || "export")}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  function importMoebel(m) {
-    const typId = m.typId || "schrank";
-    let komponenten = {};
-    if (m.komponenten && typeof m.komponenten === "object") komponenten = Object.assign({}, m.komponenten);
-    if (m.korpus !== undefined) {
-      let v = String(m.korpus);
-      if (v.indexOf("Korpus ") === 0) v = v.slice(7);
-      komponenten["Korpus"] = v;
-    }
-    if (m.front !== undefined) komponenten["Front"] = String(m.front);
-    return {
-      id: m.id || uid(),
-      typId: String(typId),
-      bezeichnung: String(m.bezeichnung || ""),
-      qm: Number(m.qm) || 0,
-      komponenten: komponenten,
-      zusaetze: Array.isArray(m.zusaetze)
-        ? m.zusaetze.map(z => ({ id: z.id || uid(), name: String(z.name || ""), menge: Number(z.menge) || 0 }))
-        : [],
-      eingeklappt: !!m.eingeklappt
-    };
-  }
-
-  function importJson(file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      try {
-        const data = JSON.parse(e.target.result);
-        if (!data || !Array.isArray(data.moebel)) {
-          alert("Datei konnte nicht gelesen werden. Bitte eine mit dieser App exportierte JSON-Datei verwenden.");
-          return;
-        }
-        if (typeof data.projektName === "string") projektName = data.projektName;
-        if (typeof data.mwstPct === "number") mwstPct = data.mwstPct;
-        if (Array.isArray(data.moebelTypen)) moebelTypen = data.moebelTypen.map(normalizeTyp);
-        moebel = data.moebel.map(importMoebel);
-        saveCatalog();
-        saveProject();
-        renderProjektName();
-        renderMwstLabel();
-        renderTypeEditor();
-        renderMoebel();
-      } catch (err) {
-        console.error(err);
-        alert("Datei konnte nicht gelesen werden. Bitte eine mit dieser App exportierte JSON-Datei verwenden.");
-      }
-    };
-    reader.onerror = function () {
-      alert("Datei konnte nicht gelesen werden. Bitte eine mit dieser App exportierte JSON-Datei verwenden.");
-    };
-    reader.readAsText(file);
+    closeNeuModal();
+    showView("project");
   }
 
   function printPdf() {
-    window.print();
+    alert("PDF-Export wird bald verfügbar sein.");
+  }
+
+  function openSettings() {
+    renderGlobalTypeEditor();
+    showView("settings");
+  }
+
+  function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("scrim").classList.remove("show");
+  }
+  function toggleSidebar() {
+    const sb = document.getElementById("sidebar");
+    const open = sb.classList.toggle("open");
+    document.getElementById("scrim").classList.toggle("show", open);
+  }
+
+  function migrateLegacy() {
+    const saved = loadJSON(STORAGE_PROJECTS);
+    if (Array.isArray(saved)) {
+      projects = saved.map(p => ({
+        id: String(p.id || uid()),
+        name: String(p.name || ""),
+        mwstPct: Number(p.mwstPct) || 22,
+        moebel: Array.isArray(p.moebel) ? p.moebel.map(importMoebel) : [],
+        moebelTypen: Array.isArray(p.moebelTypen) ? p.moebelTypen.map(normalizeTyp) : JSON.parse(JSON.stringify(globalTypen))
+      }));
+      return;
+    }
+    const legacy = loadJSON(LEGACY_PROJECT);
+    if (legacy && Array.isArray(legacy.moebel)) {
+      const p = {
+        id: uid(),
+        name: typeof legacy.projektName === "string" ? legacy.projektName : "Wohnungseinrichtung",
+        mwstPct: typeof legacy.mwstPct === "number" ? legacy.mwstPct : 22,
+        moebel: legacy.moebel.map(importMoebel),
+        moebelTypen: JSON.parse(JSON.stringify(globalTypen))
+      };
+      projects = [p];
+      saveProjects();
+      try { localStorage.removeItem(LEGACY_PROJECT); } catch (e) {}
+      return;
+    }
+    const demo = {
+      id: uid(),
+      name: "Wohnungseinrichtung",
+      mwstPct: 22,
+      moebel: seedDemoMoebel(),
+      moebelTypen: JSON.parse(JSON.stringify(globalTypen))
+    };
+    projects = [demo];
+    saveProjects();
   }
 
   function init() {
-    const savedCat = loadCatalog();
-    moebelTypen = savedCat ? savedCat.map(normalizeTyp) : JSON.parse(JSON.stringify(defaultMoebelTypen));
+    const savedCat = loadJSON(STORAGE_CATALOG);
+    globalTypen = Array.isArray(savedCat) ? savedCat.map(normalizeTyp) : JSON.parse(JSON.stringify(defaultMoebelTypen));
+    saveCatalog();
     eingeklappteTypen = loadTypCollapse();
-    const savedProj = loadProject();
-    if (savedProj && Array.isArray(savedProj.moebel)) {
-      projektName = typeof savedProj.projektName === "string" ? savedProj.projektName : "Wohnungseinrichtung";
-      mwstPct = typeof savedProj.mwstPct === "number" ? savedProj.mwstPct : 22;
-      moebel = savedProj.moebel.map(importMoebel);
-    } else {
-      initData();
-    }
 
+    migrateLegacy();
+    const savedActive = loadJSON(STORAGE_ACTIVE);
+    activeProjectId = (typeof savedActive === "string" && projects.some(p => p.id === savedActive)) ? savedActive
+      : (projects.length ? projects[0].id : null);
+    saveActive();
+
+    renderProjectList();
     renderProjektName();
     renderMwstLabel();
-    renderTypeEditor();
+    renderProjectTypeEditor();
     renderMoebel();
+    renderStorageInfo();
+
+    if (!activeProject()) showView("empty");
+    else showView("project");
 
     document.getElementById("addMoebelBtn").addEventListener("click", addMoebel);
-    document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
-    document.getElementById("importJsonBtn").addEventListener("click", () => {
-      document.getElementById("importFile").click();
-    });
     document.getElementById("printPdfBtn").addEventListener("click", printPdf);
+    document.getElementById("deleteProjectBtn").addEventListener("click", () => {
+      if (activeProjectId) deleteProject(activeProjectId);
+    });
 
-    document.getElementById("neuBtn").addEventListener("click", openNeuModal);
+    document.getElementById("newProjectBtn").addEventListener("click", openNeuModal);
+    document.getElementById("emptyNewBtn").addEventListener("click", openNeuModal);
     document.getElementById("neuCancel").addEventListener("click", closeNeuModal);
     document.getElementById("neuStart").addEventListener("click", confirmNeu);
-    document.getElementById("neuImport").addEventListener("click", () => {
-      closeNeuModal();
-      document.getElementById("importFile").click();
-    });
     document.getElementById("neuNameInput").addEventListener("keydown", (e) => {
       if (e.key === "Enter") { e.preventDefault(); confirmNeu(); }
       else if (e.key === "Escape") { e.preventDefault(); closeNeuModal(); }
@@ -1457,21 +1738,31 @@
       if (e.target === e.currentTarget) closeNeuModal();
     });
 
-    const importInput = document.getElementById("importFile");
-    importInput.addEventListener("change", (e) => {
-      const f = e.target.files && e.target.files[0];
-      if (f) importJson(f);
-      importInput.value = "";
+    document.getElementById("settingsBtn").addEventListener("click", openSettings);
+    document.getElementById("settingsBackBtn").addEventListener("click", () => {
+      showView(activeProject() ? "project" : "empty");
     });
 
-    const toggle = document.getElementById("configToggle");
-    const body = document.getElementById("configBody");
-    const hint = document.getElementById("configHint");
-    toggle.addEventListener("click", () => {
-      const open = body.style.display !== "none";
-      body.style.display = open ? "none" : "block";
-      hint.innerHTML = open ? "anzeigen &#9662;" : "ausblenden &#9654;";
+    document.getElementById("projektNameInput").addEventListener("input", (e) => {
+      const p = activeProject();
+      if (!p) return;
+      p.name = e.target.value;
+      saveProject();
+      renderProjectList();
     });
+
+    const configToggle = document.getElementById("configToggle");
+    const configBody = document.getElementById("configBody");
+    const configHint = document.getElementById("configHint");
+    configToggle.addEventListener("click", () => {
+      const open = configBody.style.display !== "none";
+      configBody.style.display = open ? "none" : "block";
+      configHint.innerHTML = open ? "anzeigen &#9662;" : "ausblenden &#9654;";
+    });
+
+    document.getElementById("menuBtn").addEventListener("click", toggleSidebar);
+    document.getElementById("menuBtn2").addEventListener("click", toggleSidebar);
+    document.getElementById("scrim").addEventListener("click", closeSidebar);
   }
 
   init();
