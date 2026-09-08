@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Möbelkalkulation</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --fg: #0f172a;
+    --muted: #64748b;
+    --muted-soft: #94a3b8;
+    --line: #e2e8f0;
+    --line-strong: #cbd5e1;
+    --accent: #334155;
+    --accent-soft: #f1f5f9;
+    --accent-strong: #1e293b;
+    --row-hover: #f8fafc;
+    --ink: #0f172a;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04);
+    --shadow: 0 1px 3px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.05);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { padding-bottom: 40px; }
+
+  /* ---- Topbar: title + tools ---- */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner {
+    max-width: 1080px; margin: 0 auto;
+    padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  }
+  .projekt-name {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.015em;
+    color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60vw;
+  }
+  .projekt-name.empty { color: var(--muted-soft); font-weight: 500; }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .topbar-total { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .endpreis-label {
+    font-size: 10px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.1em; font-weight: 600;
+  }
+  .endpreis-val {
+    font-size: 24px; font-weight: 800; color: var(--ink);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.015em; line-height: 1.1;
+  }
+  .topbar-divider { width: 1px; height: 28px; background: var(--line); }
+  .topbar-tools { display: flex; gap: 6px; }
+
+  /* ---- Layout ---- */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 28px 40px; }
+  h2 {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--muted); margin: 0 0 16px;
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  h2 .count {
+    font-weight: 500; color: var(--muted-soft); font-size: 11px;
+    text-transform: none; letter-spacing: 0;
+  }
+
+  /* ---- Inputs ---- */
+  input[type="text"], input[type="number"], select {
+    width: 100%; padding: 7px 8px;
+    border: 1px solid var(--line); border-radius: var(--radius-sm);
+    font: inherit; font-size: 14px; color: var(--fg); background: #fff;
+    transition: border-color 0.12s, box-shadow 0.12s;
+  }
+  select {
+    cursor: pointer; padding-right: 24px; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='%2394a3b8' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center;
+  }
+  input[type="number"] { text-align: right; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input:hover, select:hover { border-color: var(--line-strong); }
+  input:focus, select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(51,65,85,0.10);
+  }
+
+  /* ---- Möbel cards ---- */
+  .moebel-list { display: flex; flex-direction: column; gap: 12px; }
+  .moebel-head { display: none; }
+  .moebel-row {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.12s, box-shadow 0.12s;
+  }
+  .moebel-row:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+
+  .moebel-top {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  }
+  .bez-input {
+    flex: 1; font-size: 17px; font-weight: 700; letter-spacing: -0.01em;
+    padding: 7px 10px; border: 1px solid transparent; border-radius: var(--radius-sm);
+    background: transparent; color: var(--ink); line-height: 1.3;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  .bez-input::placeholder { color: var(--muted-soft); font-weight: 500; font-size: 16px; }
+  .bez-input:hover { border-color: var(--line); background: var(--accent-soft); }
+  .bez-input:focus { outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
+  .moebel-top .gesamtpreis {
+    display: flex; align-items: baseline; gap: 8px; white-space: nowrap; flex-shrink: 0;
+    background: var(--accent-soft); padding: 7px 14px; border-radius: 999px;
+  }
+  .moebel-top .gesamtpreis .glabel {
+    font-size: 10px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.08em; font-weight: 700;
+  }
+  .moebel-top .gesamtpreis .gval {
+    font-size: 19px; font-weight: 800; color: var(--ink);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+
+  .moebel-detail {
+    display: grid; grid-template-columns: 84px 1fr 1fr auto;
+    gap: 12px; align-items: end; margin-top: 12px;
+  }
+  .detail-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted-soft); margin-bottom: 4px;
+  }
+  .detail-field { display: flex; flex-direction: column; }
+  .moebel-prices-inline {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
+    white-space: nowrap; padding-bottom: 2px;
+  }
+  .moebel-prices-inline .sub {
+    font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
+    display: flex; gap: 6px; align-items: baseline;
+  }
+  .moebel-prices-inline .plabel {
+    font-size: 10px; color: var(--muted-soft); text-transform: uppercase;
+    letter-spacing: 0.04em; font-weight: 600;
+  }
+  .moebel-prices-inline .sep { display: none; }
+
+  /* ---- Zusätze ---- */
+  .zusatz-list {
+    margin-top: 12px; padding: 10px 12px 12px;
+    background: var(--accent-soft); border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+  }
+  .zusatz-head {
+    display: grid; grid-template-columns: minmax(150px, 1.4fr) minmax(96px, 120px) 96px 24px;
+    gap: 9px; align-items: center; padding: 0 0 6px;
+    border-bottom: 1px solid var(--line); margin-bottom: 4px;
+  }
+  .zusatz-head span {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+  }
+  .zusatz-head .sum-head { text-align: right; }
+  .zusatz-row {
+    display: grid; grid-template-columns: minmax(150px, 1.4fr) minmax(96px, 120px) 96px 24px;
+    gap: 9px; align-items: center; padding: 4px 0;
+  }
+  .zusatz-row select, .zusatz-row input { background: #fff; }
+  .menge-wrap { display: flex; align-items: baseline; gap: 6px; }
+  .menge-wrap input { width: 70px; padding: 5px 6px; font-size: 13px; }
+  .menge-wrap .einheit-suffix { font-size: 11px; color: var(--muted-soft); white-space: nowrap; }
+  .zusatz-row .sum {
+    font-weight: 700; font-size: 13px; text-align: right;
+    font-variant-numeric: tabular-nums; color: var(--ink);
+  }
+  .add-zusatz-btn {
+    margin-top: 6px; background: none; border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-sm); color: var(--muted);
+    font: inherit; font-size: 12px; cursor: pointer; padding: 6px 10px; width: 100%;
+    transition: border-color 0.12s, color 0.12s, background 0.12s;
+  }
+  .add-zusatz-btn:hover { color: var(--accent); border-color: var(--accent); background: #fff; }
+
+  /* ---- Delete × ---- */
+  .del-x {
+    width: 26px; height: 26px; padding: 0; justify-content: center;
+    border: 1px solid transparent; background: none; color: var(--muted-soft);
+    cursor: pointer; border-radius: 6px; font-size: 16px; line-height: 1;
+    display: inline-flex; align-items: center; transition: all 0.12s;
+  }
+  .del-x:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+
+  /* ---- Add Möbel button ---- */
+  .add-moebel-btn {
+    width: 100%; margin-top: 14px; padding: 14px;
+    border: 1px dashed var(--line-strong); border-radius: var(--radius);
+    background: transparent; color: var(--muted);
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: border-color 0.12s, color 0.12s, background 0.12s;
+  }
+  .add-moebel-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
+
+  /* ---- Tools (hidden — moved to topbar) ---- */
+  .tools { display: none; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 7px 14px; border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm); background: #fff; color: var(--fg);
+    font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, color 0.12s; white-space: nowrap;
+  }
+  .btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+  .btn.secondary { background: #fff; color: var(--accent); }
+  .btn.sm { padding: 6px 12px; font-size: 12px; }
+
+  /* ---- Overview card (at the bottom of the layout) ---- */
+  .summary {
+    margin-top: 24px;
+    display: flex; align-items: center; justify-content: flex-end; gap: 36px;
+    padding: 20px 24px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+  }
+  .summary .cell { text-align: right; }
+  .summary label, .summary .mwst-label {
+    display: block; font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 3px; font-weight: 700;
+  }
+  .summary .val { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .summary .cell.final { display: flex; flex-direction: column; align-items: flex-end; }
+  .summary .cell.final .val {
+    font-size: 26px; font-weight: 800; color: var(--ink);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1.1;
+  }
+  .summary-tools {
+    margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid var(--line);
+    display: flex; gap: 8px; flex-wrap: wrap; width: 100%;
+  }
+
+  /* ---- Preisliste ---- */
+  .preisliste {
+    margin-top: 40px;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm);
+  }
+  .preisliste-head {
+    padding: 14px 20px; background: var(--accent-soft);
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none;
+  }
+  .preisliste-head h2 {
+    margin: 0; color: var(--accent); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;
+  }
+  .preisliste-head .toggle { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .preisliste-body { padding: 16px 20px 20px; }
+  .preisliste-cat { margin-top: 18px; }
+  .preisliste-cat:first-child { margin-top: 0; }
+  .preisliste-cat > .cat-name {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
+  }
+  .preisliste-rows {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px;
+  }
+  .preis-item {
+    display: grid; grid-template-columns: 1fr 64px 80px; gap: 6px; align-items: center;
+  }
+  .preis-item input { padding: 6px 8px; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: var(--radius-sm); }
+  .preis-item input:focus { border-color: var(--accent); }
+  .hint { font-size: 12px; color: var(--muted); }
+
+  /* ---- Modal ---- */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(15,23,42,0.4); display: flex;
+    align-items: center; justify-content: center;
+  }
+  .modal {
+    background: #fff; border-radius: 12px; padding: 28px;
+    width: 440px; max-width: calc(100vw - 32px); box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+  }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 18px; letter-spacing: -0.01em; }
+  .modal-label {
+    display: block; font-size: 11px; color: var(--muted);
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .modal input {
+    width: 100%; padding: 11px 12px; border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm); font: inherit; font-size: 15px; background: #fff; color: var(--fg);
+  }
+  .modal input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 22px; justify-content: flex-end; flex-wrap: wrap; }
+
+  @media (max-width: 720px) {
+    .topbar-tools { display: none; }
+    .topbar-divider { display: none; }
+    .summary { gap: 20px; }
+    .summary .cell.final .val { font-size: 22px; }
+  }
+
+  /* ---- Print: hide interactive chrome, keep the estimate readable ---- */
+  @media print {
+    .topbar, .add-moebel-btn, .add-zusatz-btn, .del-x,
+    .preisliste, .summary-tools, .moebel-prices-inline { display: none !important; }
+    body { background: #fff; padding: 0; }
+    .wrap { max-width: none; padding: 0; }
+    .moebel-row { box-shadow: none; border-color: #cbd5e1; }
+    .bez-input { border: none; padding: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="projekt-name" id="projektNameDisplay">Wohnungseinrichtung</span>
+    <div class="topbar-right">
+      <div class="topbar-total">
+        <span class="endpreis-label">Endpreis brutto</span>
+        <span class="endpreis-val" id="tEndpreisHeader">0,00 &euro;</span>
+      </div>
+      <div class="topbar-divider"></div>
+      <div class="topbar-tools">
+        <button class="btn sm" id="neuBtn">Neu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section>
+    <h2>M&ouml;bel <span class="count" id="moebelCount"></span></h2>
+    <div class="moebel-list" id="moebelList"></div>
+    <button class="add-moebel-btn" id="addMoebelBtn">+ M&ouml;bel hinzuf&uuml;gen</button>
+  </section>
+
+  <div class="preisliste">
+    <div class="preisliste-head" id="preislisteToggle">
+      <h2>Preisliste</h2>
+      <span class="toggle" id="preislisteHint">anzeigen &#9662;</span>
+    </div>
+    <div class="preisliste-body" id="preislisteBody" style="display:none;">
+      <p class="hint">Preise hier anpassen &mdash; alle Berechnungen und Dropdown-Bezeichnungen aktualisieren sich live.</p>
+      <div id="preislisteEdit"></div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="cell">
+      <label>Netto</label>
+      <div class="val" id="tNetto">0,00 &euro;</div>
+    </div>
+    <div class="cell">
+      <span class="mwst-label">MwSt. 22%</span>
+      <div class="val" id="tMwstBetrag">0,00 &euro;</div>
+    </div>
+    <div class="cell final">
+      <label>Endpreis brutto</label>
+      <div class="val" id="tEndpreis">0,00 &euro;</div>
+    </div>
+    <div class="summary-tools">
+      <button class="btn" id="exportJsonBtn">JSON exportieren</button>
+      <button class="btn" id="importJsonBtn">JSON importieren</button>
+      <button class="btn primary" id="printPdfBtn">Drucken / PDF</button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="neuModal" style="display:none">
+  <div class="modal">
+    <div class="modal-title">Neues Projekt</div>
+    <label class="modal-label" for="neuNameInput">Projektname</label>
+    <input type="text" id="neuNameInput">
+    <div class="modal-actions">
+      <button class="btn" id="neuCancel">Abbrechen</button>
+      <button class="btn secondary" id="neuImport">Bestehendes importieren</button>
+      <button class="btn primary" id="neuStart">Starten</button>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  "use strict";
+
+  // ---- Preisliste ----
+  const defaultPreisliste = {
+    korpus: [
+      { name: "Korpus Dekor", einheit: "\u20ac/m\u00b2", preis: 120 },
+      { name: "Korpus Furnier", einheit: "\u20ac/m\u00b2", preis: 180 },
+      { name: "Korpus Lack", einheit: "\u20ac/m\u00b2", preis: 220 },
+      { name: "Korpus Massivholz", einheit: "\u20ac/m\u00b2", preis: 280 },
+      { name: "Korpus Hochglanz", einheit: "\u20ac/m\u00b2", preis: 320 },
+    ],
+    front: [
+      { name: "Keine", einheit: "\u20ac/m\u00b2", preis: 0 },
+      { name: "Dekor", einheit: "\u20ac/m\u00b2", preis: 80 },
+      { name: "Furnier", einheit: "\u20ac/m\u00b2", preis: 120 },
+      { name: "Farblack", einheit: "\u20ac/m\u00b2", preis: 120 },
+      { name: "Hochglanz", einheit: "\u20ac/m\u00b2", preis: 160 },
+      { name: "Massivholz", einheit: "\u20ac/m\u00b2", preis: 220 },
+      { name: "Glas", einheit: "\u20ac/m\u00b2", preis: 180 },
+    ],
+    zusatz: [
+      { name: "Passleiste", einheit: "lfm", preis: 35 },
+      { name: "Sockel", einheit: "lfm", preis: 45 },
+      { name: "Wange", einheit: "m\u00b2", preis: 140 },
+      { name: "Blende", einheit: "Stk.", preis: 45 },
+      { name: "Abdeckung", einheit: "m\u00b2", preis: 120 },
+      { name: "Einlegeboden", einheit: "Stk.", preis: 35 },
+    ],
+    schublade: [
+      { name: "Innenschublade S", einheit: "Stk.", preis: 150 },
+      { name: "Innenschublade M", einheit: "Stk.", preis: 190 },
+      { name: "Innenschublade L", einheit: "Stk.", preis: 240 },
+    ],
+    innenausstattung: [
+      { name: "Auszug", einheit: "Stk.", preis: 80 },
+      { name: "Push-to-open", einheit: "Stk.", preis: 25 },
+      { name: "Beleuchtung", einheit: "pauschal", preis: 180 },
+    ],
+    service: [
+      { name: "Montage", einheit: "pauschal", preis: 350 },
+      { name: "Lieferung", einheit: "pauschal", preis: 120 },
+    ],
+  };
+
+  let preisliste = JSON.parse(JSON.stringify(defaultPreisliste));
+
+  const zusatzCategories = ["zusatz", "schublade", "innenausstattung", "service"];
+  const catLabels = {
+    korpus: "Korpus",
+    front: "Front",
+    zusatz: "Zusatz",
+    schublade: "Schublade",
+    innenausstattung: "Innenausstattung",
+    service: "Service",
+  };
+
+  // ---- State ----
+  let projektName = "Wohnungseinrichtung";
+  let moebel = [];
+  let _idCounter = 1;
+  function uid() { return "id" + (_idCounter++); }
+
+  function findItem(cat, name) {
+    const list = preisliste[cat] || [];
+    return list.find(i => i.name === name) || null;
+  }
+
+  function zusatzItems() {
+    const out = [];
+    zusatzCategories.forEach(cat => preisliste[cat].forEach(i => out.push(Object.assign({ cat }, i))));
+    return out;
+  }
+
+  function findZusatz(name) {
+    for (const cat of zusatzCategories) {
+      const item = preisliste[cat].find(i => i.name === name);
+      if (item) return Object.assign({ cat }, item);
+    }
+    return null;
+  }
+
+  // ---- Formatting ----
+  function fmt(n) {
+    if (n === null || n === undefined || isNaN(n)) n = 0;
+    return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " \u20ac";
+  }
+  function fmtNum(n) {
+    if (n === null || n === undefined || isNaN(n)) n = 0;
+    return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function sanitizeFilename(s) { return String(s).replace(/[^a-zA-Z0-9_-]+/g, "_"); }
+  function escapeHtml(s) {
+    if (s === null || s === undefined) return "";
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  // ---- Beispiel-Daten ----
+  function initData() {
+    moebel = [
+      {
+        id: uid(),
+        bezeichnung: "K\u00fcchenunterschrank",
+        qm: 3.2,
+        korpus: "Korpus Dekor",
+        front: "Farblack",
+        zusaetze: [
+          { id: uid(), name: "Innenschublade M", menge: 3 },
+          { id: uid(), name: "Auszug", menge: 1 },
+          { id: uid(), name: "Sockel", menge: 4 },
+        ],
+      },
+      {
+        id: uid(),
+        bezeichnung: "Sideboard Wohnzimmer",
+        qm: 2.8,
+        korpus: "Korpus Furnier",
+        front: "Massivholz",
+        zusaetze: [
+          { id: uid(), name: "Innenschublade L", menge: 2 },
+        ],
+      },
+      {
+        id: uid(),
+        bezeichnung: "Kleiderschrank Schlafzimmer",
+        qm: 4.5,
+        korpus: "Korpus Furnier",
+        front: "Furnier",
+        zusaetze: [
+          { id: uid(), name: "Beleuchtung", menge: 1 },
+          { id: uid(), name: "Einlegeboden", menge: 6 },
+        ],
+      },
+    ];
+  }
+
+  // ---- Calculation ----
+  const MWST_PCT = 22;
+
+  function calcMoebel(m) {
+    const korpusItem = findItem("korpus", m.korpus);
+    const frontItem = findItem("front", m.front);
+    const korpusE = (m.qm || 0) * (korpusItem ? korpusItem.preis : 0);
+    const frontE = (m.qm || 0) * (frontItem ? frontItem.preis : 0);
+    let zusatzSum = 0;
+    (m.zusaetze || []).forEach(z => {
+      const item = findZusatz(z.name);
+      const preis = item ? item.preis : 0;
+      const summe = (z.menge || 0) * preis;
+      z._summe = summe;
+      z._einheit = item ? item.einheit : "";
+      z._einzelpreis = preis;
+      zusatzSum += summe;
+    });
+    return {
+      korpusE, frontE, zusatzSum,
+      gesamt: korpusE + frontE + zusatzSum,
+    };
+  }
+
+  function calc() {
+    let moebelGesamt = 0;
+    let zusaetzeGesamt = 0;
+    moebel.forEach(m => {
+      const c = calcMoebel(m);
+      m._calc = c;
+      moebelGesamt += c.gesamt;
+      zusaetzeGesamt += c.zusatzSum;
+    });
+    const netto = moebelGesamt;
+    const mwstPct = MWST_PCT;
+    const mwstBetrag = netto * mwstPct / 100;
+    const endpreis = netto + mwstBetrag;
+    return { moebelGesamt, zusaetzeGesamt, netto, mwstPct, mwstBetrag, endpreis };
+  }
+
+  // ---- Rendering: Möbel rows ----
+  function renderMoebel() {
+    const list = document.getElementById("moebelList");
+    list.innerHTML = "";
+    moebel.forEach((m) => {
+      list.appendChild(renderMoebelCard(m));
+    });
+    document.getElementById("moebelCount").textContent = moebel.length ? moebel.length + " St\u00fcck" : "";
+    renderEndpreis();
+  }
+
+  function renderMoebelCard(m) {
+    const c = m._calc || calcMoebel(m);
+    const row = document.createElement("div");
+    row.className = "moebel-row";
+    row.dataset.id = m.id;
+    row.innerHTML = `
+      <div class="moebel-top">
+        <input type="text" class="bez-input" data-f="bezeichnung" value="${escapeHtml(m.bezeichnung)}" placeholder="Bezeichnung">
+        <div class="gesamtpreis">
+          <span class="glabel">Gesamt</span>
+          <span class="gval" data-v="gesamt">${fmt(c.gesamt)}</span>
+        </div>
+        <button class="del-x" data-act="del-moebel" title="M&ouml;bel l&ouml;schen">&times;</button>
+      </div>
+      <div class="moebel-detail">
+        <div class="detail-field">
+          <div class="detail-label">m²</div>
+          <input type="number" data-f="qm" step="0.01" min="0" value="${m.qm}">
+        </div>
+        <div class="detail-field">
+          <div class="detail-label">Korpus</div>
+          ${selectHtml("korpus", m.korpus)}
+        </div>
+        <div class="detail-field">
+          <div class="detail-label">Front</div>
+          ${selectHtml("front", m.front)}
+        </div>
+        <div class="moebel-prices-inline">
+          <span class="sub"><span class="plabel">Korpus</span><span data-v="korpusE">${fmt(c.korpusE)}</span></span>
+          <span class="sep">&middot;</span>
+          <span class="sub"><span class="plabel">Front</span><span data-v="frontE">${fmt(c.frontE)}</span></span>
+        </div>
+      </div>
+      <div class="zusatz-list" data-v="zusaetze"></div>
+    `;
+
+    const zusatzContainer = row.querySelector('[data-v="zusaetze"]');
+    if ((m.zusaetze || []).length > 0) {
+      const head = document.createElement("div");
+      head.className = "zusatz-head";
+      head.innerHTML = `<span>Zusatz</span><span>Menge</span><span class="sum-head">Summe</span><span></span>`;
+      zusatzContainer.appendChild(head);
+    }
+    (m.zusaetze || []).forEach(z => zusatzContainer.appendChild(renderZusatzRow(z)));
+    const addBtn = document.createElement("button");
+    addBtn.className = "add-zusatz-btn";
+    addBtn.textContent = "+ Zusatz";
+    addBtn.addEventListener("click", () => {
+      const items = zusatzItems();
+      const first = items[0];
+      const z = { id: uid(), name: first ? first.name : "", menge: 1 };
+      m.zusaetze.push(z);
+      renderMoebel();
+      focusZusatzField(m.id, z.id);
+    });
+    zusatzContainer.appendChild(addBtn);
+
+    row.querySelectorAll("input, select").forEach(el => {
+      el.addEventListener("input", onMoebelInput);
+      el.addEventListener("change", onMoebelInput);
+    });
+    row.querySelector('[data-act="del-moebel"]').addEventListener("click", () => {
+      moebel = moebel.filter(x => x.id !== m.id);
+      renderMoebel();
+    });
+    return row;
+  }
+
+  function renderZusatzRow(z) {
+    const item = findZusatz(z.name);
+    const einheit = item ? item.einheit : "";
+    const einzelpreis = item ? item.preis : 0;
+    const summe = (z.menge || 0) * einzelpreis;
+    z._einheit = einheit; z._einzelpreis = einzelpreis; z._summe = summe;
+
+    const row = document.createElement("div");
+    row.className = "zusatz-row";
+    row.dataset.id = z.id;
+    row.innerHTML = `
+      <div>${zusatzSelectHtml(z.name)}</div>
+      <div class="menge-wrap">
+        <input type="number" data-zf="menge" step="0.01" min="0" value="${z.menge}">
+        <span class="einheit-suffix" data-zv="einheit">${escapeHtml(einheit)}</span>
+      </div>
+      <div class="sum" data-zv="summe">${fmt(summe)}</div>
+      <button class="del-x" data-zact="del" title="Zusatz l&ouml;schen">&times;</button>
+    `;
+    row.querySelectorAll("input, select").forEach(el => {
+      el.addEventListener("input", onZusatzInput);
+      el.addEventListener("change", onZusatzInput);
+    });
+    row.querySelector('[data-zact="del"]').addEventListener("click", () => {
+      const m = findMoebelByZusatzRow(row);
+      if (m) {
+        m.zusaetze = m.zusaetze.filter(x => x.id !== z.id);
+        renderMoebel();
+      }
+    });
+    return row;
+  }
+
+  function findMoebelByZusatzRow(row) {
+    const moebelRow = row.closest(".moebel-row");
+    const id = moebelRow.dataset.id;
+    return moebel.find(m => m.id === id);
+  }
+
+  function onMoebelInput(e) {
+    const row = e.target.closest(".moebel-row");
+    const m = moebel.find(x => x.id === row.dataset.id);
+    if (!m) return;
+    const f = e.target.dataset.f;
+    if (f === "bezeichnung") m.bezeichnung = e.target.value;
+    else if (f === "qm") m.qm = parseFloat(e.target.value) || 0;
+    else if (f === "korpus") m.korpus = e.target.value;
+    else if (f === "front") m.front = e.target.value;
+    updateCardCalc(row, m);
+    renderEndpreis();
+  }
+
+  function onZusatzInput(e) {
+    const zrow = e.target.closest(".zusatz-row");
+    const m = findMoebelByZusatzRow(zrow);
+    if (!m) return;
+    const z = m.zusaetze.find(x => x.id === zrow.dataset.id);
+    if (!z) return;
+    if (e.target.dataset.zf === "menge") z.menge = parseFloat(e.target.value) || 0;
+    else if (e.target.tagName === "SELECT") z.name = e.target.value;
+    const item = findZusatz(z.name);
+    const einheit = item ? item.einheit : "";
+    const einzelpreis = item ? item.preis : 0;
+    const summe = (z.menge || 0) * einzelpreis;
+    zrow.querySelector('[data-zv="einheit"]').textContent = einheit;
+    zrow.querySelector('[data-zv="summe"]').textContent = fmt(summe);
+    const moebelRow = e.target.closest(".moebel-row");
+    updateCardCalc(moebelRow, m);
+    renderEndpreis();
+  }
+
+  function updateCardCalc(row, m) {
+    const c = calcMoebel(m);
+    m._calc = c;
+    row.querySelector('[data-v="korpusE"]').textContent = fmt(c.korpusE);
+    row.querySelector('[data-v="frontE"]').textContent = fmt(c.frontE);
+    row.querySelector('[data-v="gesamt"]').textContent = fmt(c.gesamt);
+  }
+
+  function renderEndpreis() {
+    const r = calc();
+    document.getElementById("tNetto").textContent = fmt(r.netto);
+    document.getElementById("tMwstBetrag").textContent = fmt(r.mwstBetrag);
+    document.getElementById("tEndpreis").textContent = fmt(r.endpreis);
+    document.getElementById("tEndpreisHeader").textContent = fmt(r.endpreis);
+  }
+
+  function renderProjektName() {
+    const el = document.getElementById("projektNameDisplay");
+    const txt = (projektName || "").trim();
+    if (txt) { el.textContent = txt; el.className = "projekt-name"; }
+    else { el.textContent = "Unbenanntes Projekt"; el.className = "projekt-name empty"; }
+  }
+
+  // ---- Dropdown HTML ----
+  function selectHtml(cat, selected) {
+    const opts = preisliste[cat].map(i => {
+      const label = `${i.name} (${i.preis} ${i.einheit})`;
+      return `<option value="${escapeHtml(i.name)}" ${i.name === selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
+    }).join("");
+    return `<select data-f="${cat}">${opts}</select>`;
+  }
+
+  function zusatzSelectHtml(selected) {
+    const opts = zusatzItems().map(i => {
+      const label = `${i.name} (${i.preis} ${i.einheit})`;
+      return `<option value="${escapeHtml(i.name)}" ${i.name === selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
+    }).join("");
+    return `<select>${opts}</select>`;
+  }
+
+  // ---- Preisliste editor ----
+  function renderPreislisteEditor() {
+    const container = document.getElementById("preislisteEdit");
+    container.innerHTML = "";
+    Object.keys(preisliste).forEach(cat => {
+      const wrap = document.createElement("div");
+      wrap.className = "preisliste-cat";
+      wrap.innerHTML = `<div class="cat-name">${catLabels[cat] || cat}</div>`;
+      const rows = document.createElement("div");
+      rows.className = "preisliste-rows";
+      preisliste[cat].forEach((item, idx) => {
+        const row = document.createElement("div");
+        row.className = "preis-item";
+        row.innerHTML = `
+          <input type="text" data-pf="name" value="${escapeHtml(item.name)}">
+          <input type="text" data-pf="einheit" value="${escapeHtml(item.einheit)}">
+          <input type="number" data-pf="preis" step="0.01" min="0" value="${item.preis}">
+        `;
+        row.querySelectorAll("input").forEach(inp => {
+          inp.addEventListener("input", (e) => onPreislisteInput(e, cat, idx));
+        });
+        rows.appendChild(row);
+      });
+      wrap.appendChild(rows);
+      container.appendChild(wrap);
+    });
+  }
+
+  function onPreislisteInput(e, cat, idx) {
+    const f = e.target.dataset.pf;
+    const item = preisliste[cat][idx];
+    if (f === "name") item.name = e.target.value;
+    else if (f === "einheit") item.einheit = e.target.value;
+    else if (f === "preis") item.preis = parseFloat(e.target.value) || 0;
+    renderMoebel();
+  }
+
+  // ---- Add Möbel ----
+  function addMoebel() {
+    const k = preisliste.korpus[0];
+    const f = preisliste.front[0];
+    const m = {
+      id: uid(), bezeichnung: "", qm: 0, korpus: k ? k.name : "", front: f ? f.name : "",
+      zusaetze: [],
+    };
+    moebel.push(m);
+    renderMoebel();
+    focusMoebelBez(m.id);
+  }
+
+  function focusMoebelBez(id) {
+    const row = document.querySelector('.moebel-row[data-id="' + id + '"]');
+    if (!row) return;
+    const bez = row.querySelector('.bez-input');
+    if (bez) bez.focus();
+  }
+
+  function focusZusatzField(moebelId, zusatzId) {
+    const row = document.querySelector('.moebel-row[data-id="' + moebelId + '"]');
+    if (!row) return;
+    const zrow = row.querySelector('.zusatz-row[data-id="' + zusatzId + '"]');
+    if (!zrow) return;
+    const menge = zrow.querySelector('input[data-zf="menge"]');
+    if (menge) { menge.focus(); menge.select(); }
+  }
+
+  // ---- Neu modal ----
+  function openNeuModal() {
+    const modal = document.getElementById("neuModal");
+    const input = document.getElementById("neuNameInput");
+    modal.style.display = "flex";
+    input.value = "";
+    setTimeout(() => { input.focus(); input.select(); }, 0);
+  }
+  function closeNeuModal() {
+    document.getElementById("neuModal").style.display = "none";
+  }
+  function confirmNeu() {
+    const name = document.getElementById("neuNameInput").value.trim() || "Neues Projekt";
+    projektName = name;
+    moebel = [];
+    closeNeuModal();
+    renderProjektName();
+    renderMoebel();
+  }
+
+  // ---- JSON export ----
+  function exportJson() {
+    const data = {
+      app: "moebelkalkulation",
+      version: 1,
+      projektName: projektName,
+      mwstPct: MWST_PCT,
+      moebel: moebel.map(m => ({
+        id: m.id,
+        bezeichnung: m.bezeichnung,
+        qm: m.qm,
+        korpus: m.korpus,
+        front: m.front,
+        zusaetze: (m.zusaetze || []).map(z => ({ id: z.id, name: z.name, menge: z.menge })),
+      })),
+      preisliste: JSON.parse(JSON.stringify(preisliste)),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Moebelkalkulation_${sanitizeFilename(projektName || "export")}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ---- JSON import ----
+  function importJson(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data || !Array.isArray(data.moebel)) {
+          alert("Datei konnte nicht gelesen werden. Bitte eine mit dieser App exportierte JSON-Datei verwenden.");
+          return;
+        }
+        if (typeof data.projektName === "string") projektName = data.projektName;
+
+        if (data.preisliste && typeof data.preisliste === "object") {
+          const merged = {};
+          Object.keys(defaultPreisliste).forEach(k => {
+            merged[k] = Array.isArray(data.preisliste[k])
+              ? data.preisliste[k].map(i => ({
+                  name: String(i.name || ""),
+                  einheit: String(i.einheit || ""),
+                  preis: Number(i.preis) || 0,
+                }))
+              : JSON.parse(JSON.stringify(defaultPreisliste[k]));
+          });
+          preisliste = merged;
+          renderPreislisteEditor();
+        }
+
+        moebel = data.moebel.map(m => ({
+          id: m.id || uid(),
+          bezeichnung: String(m.bezeichnung || ""),
+          qm: Number(m.qm) || 0,
+          korpus: String(m.korpus || ""),
+          front: String(m.front || ""),
+          zusaetze: Array.isArray(m.zusaetze)
+            ? m.zusaetze.map(z => ({ id: z.id || uid(), name: String(z.name || ""), menge: Number(z.menge) || 0 }))
+            : [],
+        }));
+
+        renderProjektName();
+        renderMoebel();
+      } catch (err) {
+        console.error(err);
+        alert("Datei konnte nicht gelesen werden. Bitte eine mit dieser App exportierte JSON-Datei verwenden.");
+      }
+    };
+    reader.onerror = function () {
+      alert("Datei konnte nicht gelesen werden. Bitte eine mit dieser App exportierte JSON-Datei verwenden.");
+    };
+    reader.readAsText(file);
+  }
+
+  // ---- Print (native browser "Save as PDF") ----
+  function printPdf() {
+    window.print();
+  }
+
+  // ---- Init ----
+  function init() {
+    initData();
+    renderProjektName();
+    renderPreislisteEditor();
+    renderMoebel();
+
+    document.getElementById("addMoebelBtn").addEventListener("click", addMoebel);
+    document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
+    document.getElementById("importJsonBtn").addEventListener("click", () => {
+      document.getElementById("importFile").click();
+    });
+    document.getElementById("printPdfBtn").addEventListener("click", printPdf);
+
+    document.getElementById("neuBtn").addEventListener("click", openNeuModal);
+    document.getElementById("neuCancel").addEventListener("click", closeNeuModal);
+    document.getElementById("neuStart").addEventListener("click", confirmNeu);
+    document.getElementById("neuImport").addEventListener("click", () => {
+      closeNeuModal();
+      document.getElementById("importFile").click();
+    });
+    document.getElementById("neuNameInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); confirmNeu(); }
+      else if (e.key === "Escape") { e.preventDefault(); closeNeuModal(); }
+    });
+    document.getElementById("neuModal").addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeNeuModal();
+    });
+
+    const importInput = document.getElementById("importFile");
+    importInput.addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) importJson(f);
+      importInput.value = "";
+    });
+
+    const toggle = document.getElementById("preislisteToggle");
+    const body = document.getElementById("preislisteBody");
+    const hint = document.getElementById("preislisteHint");
+    toggle.addEventListener("click", () => {
+      const open = body.style.display !== "none";
+      body.style.display = open ? "none" : "block";
+      hint.innerHTML = open ? "anzeigen &#9662;" : "ausblenden &#9654;";
+    });
+  }
+
+  init();
+})();
+</script>
+
+</body>
+</html>
