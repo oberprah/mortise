@@ -205,6 +205,19 @@
   }
   .del-x:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
 
+  /* ---- Collapse toggle ---- */
+  .collapse-btn {
+    width: 26px; height: 26px; padding: 0; justify-content: center;
+    border: 1px solid transparent; background: none; color: var(--muted-soft);
+    cursor: pointer; border-radius: 6px; font-size: 13px; line-height: 1;
+    display: inline-flex; align-items: center; transition: all 0.12s;
+    flex-shrink: 0; user-select: none;
+  }
+  .collapse-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--line); }
+  .moebel-row.eingeklappt .moebel-detail,
+  .moebel-row.eingeklappt .zusatz-list { display: none; }
+  .typ-block.eingeklappt .typ-section { display: none; }
+
   /* ---- Add Möbel button ---- */
   .add-moebel-btn {
     width: 100%; margin-top: 14px; padding: 14px;
@@ -353,6 +366,10 @@
     .wrap { max-width: none; padding: 0; }
     .moebel-row { box-shadow: none; border-color: #cbd5e1; }
     .bez-input { border: none; padding: 0; }
+    .collapse-btn { display: none !important; }
+    .moebel-row.eingeklappt .moebel-detail,
+    .moebel-row.eingeklappt .zusatz-list { display: revert !important; }
+    .typ-block.eingeklappt .typ-section { display: revert !important; }
   }
 </style>
 </head>
@@ -529,11 +546,13 @@
 
   const STORAGE_CATALOG = "mortise.catalog";
   const STORAGE_PROJECT = "mortise.project";
+  const STORAGE_TYP_COLLAPSE = "mortise.typCollapse";
 
   let moebelTypen = [];
   let projektName = "Wohnungseinrichtung";
   let mwstPct = 22;
   let moebel = [];
+  let eingeklappteTypen = new Set();
 
   function uid() {
     return "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -560,6 +579,16 @@
     try {
       localStorage.setItem(STORAGE_PROJECT, JSON.stringify({ projektName: projektName, mwstPct: mwstPct, moebel: moebel }));
     } catch (e) {}
+  }
+  function loadTypCollapse() {
+    try {
+      const raw = localStorage.getItem(STORAGE_TYP_COLLAPSE);
+      if (raw) return new Set(JSON.parse(raw));
+    } catch (e) {}
+    return new Set();
+  }
+  function saveTypCollapse() {
+    try { localStorage.setItem(STORAGE_TYP_COLLAPSE, JSON.stringify(Array.from(eingeklappteTypen))); } catch (e) {}
   }
 
   function normalizeTyp(t) {
@@ -740,6 +769,7 @@
     const row = document.createElement("div");
     row.className = "moebel-row";
     row.dataset.id = m.id;
+    if (m.eingeklappt) row.classList.add("eingeklappt");
 
     const typeOpts = moebelTypen.map(t =>
       `<option value="${escapeHtml(t.id)}"${t.id === m.typId ? " selected" : ""}>${escapeHtml(t.name || t.id)}</option>`
@@ -766,6 +796,7 @@
 
     row.innerHTML = `
       <div class="moebel-top">
+        <button class="collapse-btn" data-act="toggle-collapse" title="${m.eingeklappt ? "Aufklappen" : "Einklappen"}">${m.eingeklappt ? "&#9656;" : "&#9662;"}</button>
         <input type="text" class="bez-input" data-f="bezeichnung" value="${escapeHtml(m.bezeichnung)}" placeholder="Bezeichnung">
         <div class="typ-field"><div class="detail-label">Typ</div>${typSelect}</div>
         <div class="gesamtpreis">
@@ -826,6 +857,14 @@
       moebel = moebel.filter(x => x.id !== m.id);
       saveProject();
       renderMoebel();
+    });
+    row.querySelector('[data-act="toggle-collapse"]').addEventListener("click", () => {
+      m.eingeklappt = !m.eingeklappt;
+      row.classList.toggle("eingeklappt", m.eingeklappt);
+      const btn = row.querySelector('[data-act="toggle-collapse"]');
+      btn.innerHTML = m.eingeklappt ? "&#9656;" : "&#9662;";
+      btn.title = m.eingeklappt ? "Aufklappen" : "Einklappen";
+      saveProject();
     });
     return row;
   }
@@ -1011,9 +1050,23 @@
     const block = document.createElement("div");
     block.className = "typ-block";
     block.dataset.tid = typ.id;
+    if (eingeklappteTypen.has(typ.id)) block.classList.add("eingeklappt");
 
     const head = document.createElement("div");
     head.className = "typ-block-head";
+    const collapseBtn = document.createElement("button");
+    collapseBtn.className = "collapse-btn";
+    collapseBtn.innerHTML = eingeklappteTypen.has(typ.id) ? "&#9656;" : "&#9662;";
+    collapseBtn.title = eingeklappteTypen.has(typ.id) ? "Aufklappen" : "Einklappen";
+    collapseBtn.addEventListener("click", () => {
+      const geklappt = !eingeklappteTypen.has(typ.id);
+      if (geklappt) eingeklappteTypen.add(typ.id);
+      else eingeklappteTypen.delete(typ.id);
+      block.classList.toggle("eingeklappt", geklappt);
+      collapseBtn.innerHTML = geklappt ? "&#9656;" : "&#9662;";
+      collapseBtn.title = geklappt ? "Aufklappen" : "Einklappen";
+      saveTypCollapse();
+    });
     const nameInp = document.createElement("input");
     nameInp.type = "text";
     nameInp.value = typ.name;
@@ -1031,10 +1084,13 @@
     delBtn.addEventListener("click", () => {
       if (!confirm(`Möbeltyp „${typ.name || ""}“ löschen?`)) return;
       moebelTypen = moebelTypen.filter(t => t.id !== typ.id);
+      eingeklappteTypen.delete(typ.id);
+      saveTypCollapse();
       saveCatalog();
       renderTypeEditor();
       renderMoebel();
     });
+    head.appendChild(collapseBtn);
     head.appendChild(nameInp);
     head.appendChild(delBtn);
     block.appendChild(head);
@@ -1322,7 +1378,8 @@
       komponenten: komponenten,
       zusaetze: Array.isArray(m.zusaetze)
         ? m.zusaetze.map(z => ({ id: z.id || uid(), name: String(z.name || ""), menge: Number(z.menge) || 0 }))
-        : []
+        : [],
+      eingeklappt: !!m.eingeklappt
     };
   }
 
@@ -1363,6 +1420,7 @@
   function init() {
     const savedCat = loadCatalog();
     moebelTypen = savedCat ? savedCat.map(normalizeTyp) : JSON.parse(JSON.stringify(defaultMoebelTypen));
+    eingeklappteTypen = loadTypCollapse();
     const savedProj = loadProject();
     if (savedProj && Array.isArray(savedProj.moebel)) {
       projektName = typeof savedProj.projektName === "string" ? savedProj.projektName : "Wohnungseinrichtung";
