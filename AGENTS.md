@@ -1,0 +1,25 @@
+# Agents
+
+## Intent-driven design
+
+Code shows what was done, not what the user asked for or why. We write that
+down so the next agent knows what goal a piece of work served and what was
+decided to get there.
+
+One file per intent in `docs/intent/`, named `YYYYMMDD-<slug>.md`. At least one
+per pull request. Written during the work. Immutable after PR.
+
+See [the template](docs/intent/_TEMPLATE.md).
+
+## Writing style
+
+Lean, as short as possible (focus on the key parts), simple and plain English.
+One idea per sentence.
+
+Verdict first. The most important thing goes at the top, every time.
+
+When several paragraphs belong to one group, put them under bullets or a
+heading. Structure is there to help the eye scan, not to decorate. In a bullet
+list of parallel items, open each line with a bold label of one to three
+words, so the eye can pick the line it needs and skip the rest. Never add a
+list the answer did not already need.
