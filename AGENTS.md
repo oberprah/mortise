@@ -1,5 +1,17 @@
 # Agents
 
+## Project
+
+Mortise is a lean, static, offline tool that helps carpenters build rough
+cost estimates for customers. A carpenter adds furniture pieces, picks
+materials and add-ons, sees a live total, and hands the result to the
+customer as a PDF.
+
+It is a proof of concept for a new way of working, not yet in use.
+
+The app is a single `index.html` with no build step and no backend. It runs
+locally or via GitHub Pages. Projects are saved as JSON files.
+
 ## Intent-driven design
 
 Code shows what was done, not what the user asked for or why. We write that
