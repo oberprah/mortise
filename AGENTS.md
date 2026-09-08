@@ -23,6 +23,10 @@ per pull request. Written during the work, not at the end. When a decision is
 made or changed mid-work, update the intent doc in the same commit as the
 code — not in a later pass. The doc and the diff ship together.
 
+A new decision can go into an existing doc or a new one. New intent files
+can be small — a few lines capturing one decision is enough. They don't
+need to be long or exhaustive.
+
 Immutable after PR.
 
 See [the template](docs/intent/_TEMPLATE.md).
