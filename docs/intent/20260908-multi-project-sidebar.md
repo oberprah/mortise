@@ -41,10 +41,12 @@ lives on the project, not shared. Calc and rendering read the active
 project's snapshot; the global catalog only seeds new projects and the
 "reload from global" action.
 
-**Layout.** A flex `.app` with a fixed 248px sidebar (project list + New at
-top, Settings at the bottom) and a `.main` area holding one floating
-`.card`. The card swaps between project view and settings view via a view
-state. Body gets a soft gradient so the white card floats.
+**Layout.** A fixed 248px sidebar (project list + New at top, Settings +
+storage indicator at the bottom, no right border) and a `.main` area holding
+one floating white `.card` on a flat light gray background (`#f4f6f9`). The
+card fills the viewport with a small margin on all sides (8px to the sidebar,
+16px elsewhere) and scrolls internally; the page itself never scrolls. Below
+860px the sidebar becomes an off-canvas drawer toggled by a menu button.
 
 **Type editor.** Generalized to take a context (`typen`, optional `moebel`
 for name migrations, `onSave`, `onChange`, `onReset`, `resetLabel`). The same
@@ -58,10 +60,19 @@ small forms.
 
 **Dropped.** JSON export/import buttons, the hidden file input, the import
 code paths, the "Bestehendes importieren" button in the new-project modal.
-PDF button calls an alert instead of `window.print()`.
+PDF button calls an alert instead of `window.print()`. No Tailwind — the
+no-build-step principle rules out a CDN script or a build pipeline.
 
-**Responsive.** Below 860px the sidebar becomes an off-canvas drawer toggled
-by a menu button in the card header.
+**Storage indicator.** The sidebar shows live localStorage usage (KB +
+percentage) below Settings. Color shifts amber past 50%, red past 80%.
+
+**Delete.** Lives in the main card header as a labeled "Löschen" button with
+confirm, not as a hover × in the sidebar — too easy to hit by accident there.
+
+**Firefox theme-color.** `theme-color` and `color-scheme` meta tags are set
+for Chrome, Edge, and Safari. Firefox desktop ignores `theme-color` by
+design (no code path reads it); its chrome color comes from the browser
+theme only. Not worth chasing further.
 
 ## Decisions considered
 
@@ -73,4 +84,9 @@ by a menu button in the card header.
 - *Settings as modal vs. full-page view.* Full-page. The editor is wide and
     dense; a modal would cramp it.
 - *localStorage vs. IndexedDB for the project list.* localStorage. Same
-    reasoning as the MVP: small JSON, sync, offline, no library.
+    reasoning as the MVP: small JSON, sync, offline, no library. Limit is
+    ~5 MB; a rich project is ~10 KB, so ~500 projects fit. A storage
+    indicator makes the limit visible before it bites.
+- *Tailwind vs. plain CSS.* Plain CSS. One-file, no-build is a design
+    principle; the CSS is small enough that a utility framework isn't worth
+    the CDN or build cost.
