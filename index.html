@@ -109,16 +109,19 @@
 
   .moebel-top {
     display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    flex-wrap: wrap;
   }
   .bez-input {
     flex: 1; font-size: 17px; font-weight: 700; letter-spacing: -0.01em;
     padding: 7px 10px; border: 1px solid transparent; border-radius: var(--radius-sm);
     background: transparent; color: var(--ink); line-height: 1.3;
     transition: border-color 0.12s, background 0.12s;
+    min-width: 180px;
   }
   .bez-input::placeholder { color: var(--muted-soft); font-weight: 500; font-size: 16px; }
   .bez-input:hover { border-color: var(--line); background: var(--accent-soft); }
   .bez-input:focus { outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
+  .moebel-top .typ-field { flex: 0 0 170px; display: flex; flex-direction: column; }
   .moebel-top .gesamtpreis {
     display: flex; align-items: baseline; gap: 8px; white-space: nowrap; flex-shrink: 0;
     background: var(--accent-soft); padding: 7px 14px; border-radius: 999px;
@@ -133,17 +136,18 @@
   }
 
   .moebel-detail {
-    display: grid; grid-template-columns: 84px 1fr 1fr auto;
-    gap: 12px; align-items: end; margin-top: 12px;
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-top: 12px;
   }
   .detail-label {
     font-size: 9px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.1em; color: var(--muted-soft); margin-bottom: 4px;
   }
   .detail-field { display: flex; flex-direction: column; }
+  .field-m2 { flex: 0 0 84px; }
+  .field-comp { flex: 1 1 150px; min-width: 130px; }
   .moebel-prices-inline {
     display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
-    white-space: nowrap; padding-bottom: 2px;
+    white-space: nowrap; padding-bottom: 2px; margin-left: auto;
   }
   .moebel-prices-inline .sub {
     font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
@@ -197,8 +201,22 @@
     border: 1px solid transparent; background: none; color: var(--muted-soft);
     cursor: pointer; border-radius: 6px; font-size: 16px; line-height: 1;
     display: inline-flex; align-items: center; transition: all 0.12s;
+    flex-shrink: 0;
   }
   .del-x:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+
+  /* ---- Collapse toggle ---- */
+  .collapse-btn {
+    width: 26px; height: 26px; padding: 0; justify-content: center;
+    border: 1px solid transparent; background: none; color: var(--muted-soft);
+    cursor: pointer; border-radius: 6px; font-size: 13px; line-height: 1;
+    display: inline-flex; align-items: center; transition: all 0.12s;
+    flex-shrink: 0; user-select: none;
+  }
+  .collapse-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--line); }
+  .moebel-row.eingeklappt .moebel-detail,
+  .moebel-row.eingeklappt .zusatz-list { display: none; }
+  .typ-block.eingeklappt .typ-section { display: none; }
 
   /* ---- Add Möbel button ---- */
   .add-moebel-btn {
@@ -254,39 +272,61 @@
     display: flex; gap: 8px; flex-wrap: wrap; width: 100%;
   }
 
-  /* ---- Preisliste ---- */
-  .preisliste {
+  /* ---- Config panel (Möbeltypen editor) ---- */
+  .config-panel {
     margin-top: 40px;
     border: 1px solid var(--line); border-radius: var(--radius);
     overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm);
   }
-  .preisliste-head {
+  .config-panel-head {
     padding: 14px 20px; background: var(--accent-soft);
     border-bottom: 1px solid var(--line);
     display: flex; align-items: center; justify-content: space-between;
     cursor: pointer; user-select: none;
   }
-  .preisliste-head h2 {
+  .config-panel-head h2 {
     margin: 0; color: var(--accent); font-size: 11px;
     text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;
   }
-  .preisliste-head .toggle { font-size: 12px; color: var(--muted); font-weight: 600; }
-  .preisliste-body { padding: 16px 20px 20px; }
-  .preisliste-cat { margin-top: 18px; }
-  .preisliste-cat:first-child { margin-top: 0; }
-  .preisliste-cat > .cat-name {
-    font-size: 10px; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
+  .config-panel-head .toggle { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .config-panel-body { padding: 16px 20px 20px; }
+  .hint { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+
+  .typ-block {
+    border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 12px; margin-bottom: 12px; background: #fff;
   }
-  .preisliste-rows {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px;
+  .typ-block-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .typ-block-head .typ-name { flex: 1; font-weight: 700; font-size: 15px; }
+  .typ-section {
+    margin-left: 12px; padding-left: 12px;
+    border-left: 2px solid var(--line); margin-top: 10px;
   }
-  .preis-item {
-    display: grid; grid-template-columns: 1fr 64px 80px; gap: 6px; align-items: center;
+  .typ-section-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px;
   }
-  .preis-item input { padding: 6px 8px; font-size: 13px; border: 1px solid var(--line); background: #fff; border-radius: var(--radius-sm); }
-  .preis-item input:focus { border-color: var(--accent); }
-  .hint { font-size: 12px; color: var(--muted); }
+  .comp-block { margin-bottom: 8px; }
+  .comp-block-head { display: flex; gap: 6px; align-items: center; }
+  .comp-block-head input { flex: 1; font-weight: 600; }
+  .opt-row {
+    display: grid; grid-template-columns: 1fr 84px 26px;
+    gap: 6px; align-items: center; margin: 4px 0 4px 18px;
+  }
+  .opt-row input { padding: 4px 8px; font-size: 13px; }
+  .zusatzdef-row {
+    display: grid; grid-template-columns: 1fr 130px 84px 26px;
+    gap: 6px; align-items: center; margin: 4px 0;
+  }
+  .zusatzdef-row input, .zusatzdef-row select { padding: 5px 8px; font-size: 13px; }
+  .mini-add-btn {
+    margin: 6px 0 0 18px; background: none; border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-sm); color: var(--muted);
+    font: inherit; font-size: 12px; cursor: pointer; padding: 5px 10px;
+    transition: border-color 0.12s, color 0.12s, background 0.12s;
+  }
+  .mini-add-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .typ-actions { display: flex; gap: 8px; margin-top: 8px; }
 
   /* ---- Modal ---- */
   .modal-overlay {
@@ -315,16 +355,21 @@
     .topbar-divider { display: none; }
     .summary { gap: 20px; }
     .summary .cell.final .val { font-size: 22px; }
+    .moebel-top .typ-field { flex: 1 1 100%; }
   }
 
   /* ---- Print: hide interactive chrome, keep the estimate readable ---- */
   @media print {
     .topbar, .add-moebel-btn, .add-zusatz-btn, .del-x,
-    .preisliste, .summary-tools, .moebel-prices-inline { display: none !important; }
+    .config-panel, .summary-tools, .moebel-prices-inline { display: none !important; }
     body { background: #fff; padding: 0; }
     .wrap { max-width: none; padding: 0; }
     .moebel-row { box-shadow: none; border-color: #cbd5e1; }
     .bez-input { border: none; padding: 0; }
+    .collapse-btn { display: none !important; }
+    .moebel-row.eingeklappt .moebel-detail,
+    .moebel-row.eingeklappt .zusatz-list { display: revert !important; }
+    .typ-block.eingeklappt .typ-section { display: revert !important; }
   }
 </style>
 </head>
@@ -352,14 +397,14 @@
     <button class="add-moebel-btn" id="addMoebelBtn">+ M&ouml;bel hinzuf&uuml;gen</button>
   </section>
 
-  <div class="preisliste">
-    <div class="preisliste-head" id="preislisteToggle">
-      <h2>Preisliste</h2>
-      <span class="toggle" id="preislisteHint">anzeigen &#9662;</span>
+  <div class="config-panel">
+    <div class="config-panel-head" id="configToggle">
+      <h2>M&ouml;beltypen</h2>
+      <span class="toggle" id="configHint">anzeigen &#9662;</span>
     </div>
-    <div class="preisliste-body" id="preislisteBody" style="display:none;">
-      <p class="hint">Preise hier anpassen &mdash; alle Berechnungen und Dropdown-Bezeichnungen aktualisieren sich live.</p>
-      <div id="preislisteEdit"></div>
+    <div class="config-panel-body" id="configBody" style="display:none;">
+      <p class="hint">Typen, Komponenten und Zus&auml;tze hier anpassen &mdash; alle Berechnungen und Dropdown-Bezeichnungen aktualisieren sich live.</p>
+      <div id="typEdit"></div>
     </div>
   </div>
 
@@ -369,7 +414,7 @@
       <div class="val" id="tNetto">0,00 &euro;</div>
     </div>
     <div class="cell">
-      <span class="mwst-label">MwSt. 22%</span>
+      <span class="mwst-label" id="mwstLabel">MwSt. 22%</span>
       <div class="val" id="tMwstBetrag">0,00 &euro;</div>
     </div>
     <div class="cell final">
@@ -401,89 +446,185 @@
 (function () {
   "use strict";
 
-  // ---- Preisliste ----
-  const defaultPreisliste = {
-    korpus: [
-      { name: "Korpus Dekor", einheit: "\u20ac/m\u00b2", preis: 120 },
-      { name: "Korpus Furnier", einheit: "\u20ac/m\u00b2", preis: 180 },
-      { name: "Korpus Lack", einheit: "\u20ac/m\u00b2", preis: 220 },
-      { name: "Korpus Massivholz", einheit: "\u20ac/m\u00b2", preis: 280 },
-      { name: "Korpus Hochglanz", einheit: "\u20ac/m\u00b2", preis: 320 },
-    ],
-    front: [
-      { name: "Keine", einheit: "\u20ac/m\u00b2", preis: 0 },
-      { name: "Dekor", einheit: "\u20ac/m\u00b2", preis: 80 },
-      { name: "Furnier", einheit: "\u20ac/m\u00b2", preis: 120 },
-      { name: "Farblack", einheit: "\u20ac/m\u00b2", preis: 120 },
-      { name: "Hochglanz", einheit: "\u20ac/m\u00b2", preis: 160 },
-      { name: "Massivholz", einheit: "\u20ac/m\u00b2", preis: 220 },
-      { name: "Glas", einheit: "\u20ac/m\u00b2", preis: 180 },
-    ],
-    zusatz: [
-      { name: "Passleiste", einheit: "lfm", preis: 35 },
-      { name: "Sockel", einheit: "lfm", preis: 45 },
-      { name: "Wange", einheit: "m\u00b2", preis: 140 },
-      { name: "Blende", einheit: "Stk.", preis: 45 },
-      { name: "Abdeckung", einheit: "m\u00b2", preis: 120 },
-      { name: "Einlegeboden", einheit: "Stk.", preis: 35 },
-    ],
-    schublade: [
-      { name: "Innenschublade S", einheit: "Stk.", preis: 150 },
-      { name: "Innenschublade M", einheit: "Stk.", preis: 190 },
-      { name: "Innenschublade L", einheit: "Stk.", preis: 240 },
-    ],
-    innenausstattung: [
-      { name: "Auszug", einheit: "Stk.", preis: 80 },
-      { name: "Push-to-open", einheit: "Stk.", preis: 25 },
-      { name: "Beleuchtung", einheit: "pauschal", preis: 180 },
-    ],
-    service: [
-      { name: "Montage", einheit: "pauschal", preis: 350 },
-      { name: "Lieferung", einheit: "pauschal", preis: 120 },
-    ],
-  };
-
-  let preisliste = JSON.parse(JSON.stringify(defaultPreisliste));
-
-  const zusatzCategories = ["zusatz", "schublade", "innenausstattung", "service"];
-  const catLabels = {
-    korpus: "Korpus",
-    front: "Front",
-    zusatz: "Zusatz",
-    schublade: "Schublade",
-    innenausstattung: "Innenausstattung",
-    service: "Service",
-  };
-
-  // ---- State ----
-  let projektName = "Wohnungseinrichtung";
-  let moebel = [];
-  let _idCounter = 1;
-  function uid() { return "id" + (_idCounter++); }
-
-  function findItem(cat, name) {
-    const list = preisliste[cat] || [];
-    return list.find(i => i.name === name) || null;
-  }
-
-  function zusatzItems() {
-    const out = [];
-    zusatzCategories.forEach(cat => preisliste[cat].forEach(i => out.push(Object.assign({ cat }, i))));
-    return out;
-  }
-
-  function findZusatz(name) {
-    for (const cat of zusatzCategories) {
-      const item = preisliste[cat].find(i => i.name === name);
-      if (item) return Object.assign({ cat }, item);
+  const defaultMoebelTypen = [
+    {
+      id: "schrank",
+      name: "Schrank",
+      komponenten: [
+        {
+          name: "Korpus",
+          optionen: [
+            { name: "Dekor", preis: 120 },
+            { name: "Furnier", preis: 180 },
+            { name: "Lack", preis: 220 },
+            { name: "Massivholz", preis: 280 },
+            { name: "Hochglanz", preis: 320 }
+          ]
+        },
+        {
+          name: "Front",
+          optionen: [
+            { name: "Keine", preis: 0 },
+            { name: "Dekor", preis: 80 },
+            { name: "Furnier", preis: 120 },
+            { name: "Farblack", preis: 120 },
+            { name: "Hochglanz", preis: 160 },
+            { name: "Massivholz", preis: 220 },
+            { name: "Glas", preis: 180 }
+          ]
+        }
+      ],
+      zusaetze: [
+        { name: "Passleiste",       mengeArt: "laenge",   preis: 35 },
+        { name: "Sockel",           mengeArt: "laenge",   preis: 45 },
+        { name: "Wange",            mengeArt: "flaeche",  preis: 140 },
+        { name: "Blende",           mengeArt: "stueck",   preis: 45 },
+        { name: "Abdeckung",        mengeArt: "flaeche",  preis: 120 },
+        { name: "Einlegeboden",     mengeArt: "stueck",   preis: 35 },
+        { name: "Innenschublade S", mengeArt: "stueck",   preis: 150 },
+        { name: "Innenschublade M", mengeArt: "stueck",   preis: 190 },
+        { name: "Innenschublade L", mengeArt: "stueck",   preis: 240 },
+        { name: "Auszug",           mengeArt: "stueck",   preis: 80 },
+        { name: "Push-to-open",     mengeArt: "stueck",   preis: 25 },
+        { name: "Beleuchtung",      mengeArt: "pauschal", preis: 180 },
+        { name: "Montage",          mengeArt: "pauschal", preis: 350 },
+        { name: "Lieferung",        mengeArt: "pauschal", preis: 120 }
+      ]
+    },
+    {
+      id: "decke",
+      name: "Decke",
+      komponenten: [
+        {
+          name: "Korpus",
+          optionen: [
+            { name: "Dekor", preis: 120 },
+            { name: "Furnier", preis: 180 },
+            { name: "Massivholz", preis: 280 }
+          ]
+        }
+      ],
+      zusaetze: [
+        { name: "Ausschnitte",       mengeArt: "stueck",   preis: 45 },
+        { name: "Aufpolsterung",     mengeArt: "flaeche",  preis: 90 },
+        { name: "Beleuchtung",       mengeArt: "pauschal", preis: 180 },
+        { name: "Lüftung",           mengeArt: "pauschal", preis: 120 },
+        { name: "Inspektionsdeckel", mengeArt: "stueck",   preis: 65 },
+        { name: "Montage",           mengeArt: "pauschal", preis: 350 },
+        { name: "Lieferung",         mengeArt: "pauschal", preis: 120 }
+      ]
+    },
+    {
+      id: "wandverkleidung",
+      name: "Wandverkleidung",
+      komponenten: [
+        {
+          name: "Korpus",
+          optionen: [
+            { name: "Dekor", preis: 120 },
+            { name: "Furnier", preis: 180 }
+          ]
+        }
+      ],
+      zusaetze: [
+        { name: "Türverkleidungen",      mengeArt: "laenge",   preis: 55 },
+        { name: "Inspektionsdeckel Tür",  mengeArt: "stueck",   preis: 65 },
+        { name: "Fensterverkleidungen",   mengeArt: "laenge",   preis: 55 },
+        { name: "Rundungen",              mengeArt: "laenge",   preis: 45 },
+        { name: "Montage",                mengeArt: "pauschal", preis: 350 },
+        { name: "Lieferung",              mengeArt: "pauschal", preis: 120 }
+      ]
     }
+  ];
+
+  const MENGE_ARTEN = [
+    { value: "flaeche",  label: "Fläche (€/m²)" },
+    { value: "laenge",   label: "Länge (lfm)" },
+    { value: "stueck",   label: "Stück (Stk.)" },
+    { value: "pauschal", label: "Pauschal" }
+  ];
+
+  const STORAGE_CATALOG = "mortise.catalog";
+  const STORAGE_PROJECT = "mortise.project";
+  const STORAGE_TYP_COLLAPSE = "mortise.typCollapse";
+
+  let moebelTypen = [];
+  let projektName = "Wohnungseinrichtung";
+  let mwstPct = 22;
+  let moebel = [];
+  let eingeklappteTypen = new Set();
+
+  function uid() {
+    return "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+
+  function loadCatalog() {
+    try {
+      const raw = localStorage.getItem(STORAGE_CATALOG);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
     return null;
   }
+  function saveCatalog() {
+    try { localStorage.setItem(STORAGE_CATALOG, JSON.stringify(moebelTypen)); } catch (e) {}
+  }
+  function loadProject() {
+    try {
+      const raw = localStorage.getItem(STORAGE_PROJECT);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return null;
+  }
+  function saveProject() {
+    try {
+      localStorage.setItem(STORAGE_PROJECT, JSON.stringify({ projektName: projektName, mwstPct: mwstPct, moebel: moebel }));
+    } catch (e) {}
+  }
+  function loadTypCollapse() {
+    try {
+      const raw = localStorage.getItem(STORAGE_TYP_COLLAPSE);
+      if (raw) return new Set(JSON.parse(raw));
+    } catch (e) {}
+    return new Set();
+  }
+  function saveTypCollapse() {
+    try { localStorage.setItem(STORAGE_TYP_COLLAPSE, JSON.stringify(Array.from(eingeklappteTypen))); } catch (e) {}
+  }
 
-  // ---- Formatting ----
+  function normalizeTyp(t) {
+    return {
+      id: String(t.id || uid()),
+      name: String(t.name || ""),
+      komponenten: Array.isArray(t.komponenten) ? t.komponenten.map(normalizeComp) : [],
+      zusaetze: Array.isArray(t.zusaetze) ? t.zusaetze.map(normalizeZusatzDef) : []
+    };
+  }
+  function normalizeComp(c) {
+    return {
+      name: String(c.name || ""),
+      optionen: Array.isArray(c.optionen)
+        ? c.optionen.map(o => ({ name: String(o.name || ""), preis: Number(o.preis) || 0 }))
+        : []
+    };
+  }
+  function normalizeZusatzDef(z) {
+    const art = String(z.mengeArt || "stueck");
+    return { name: String(z.name || ""), mengeArt: MENGE_ARTEN.some(a => a.value === art) ? art : "stueck", preis: Number(z.preis) || 0 };
+  }
+
+  function findTyp(id) { return moebelTypen.find(t => t.id === id) || null; }
+  function findOption(comp, name) { return (comp.optionen || []).find(o => o.name === name) || null; }
+  function findZusatzDef(typ, name) { return (typ.zusaetze || []).find(z => z.name === name) || null; }
+  function einheitForMengetArt(art) {
+    if (art === "flaeche") return "€/m²";
+    if (art === "laenge") return "lfm";
+    if (art === "stueck") return "Stk.";
+    return "pauschal";
+  }
+
   function fmt(n) {
     if (n === null || n === undefined || isNaN(n)) n = 0;
-    return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " \u20ac";
+    return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
   }
   function fmtNum(n) {
     if (n === null || n === undefined || isNaN(n)) n = 0;
@@ -495,67 +636,100 @@
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  // ---- Beispiel-Daten ----
+  function migrateComponentName(typId, oldName, newName) {
+    if (!oldName || oldName === newName) return;
+    moebel.forEach(m => {
+      if (m.typId !== typId || !m.komponenten) return;
+      if (Object.prototype.hasOwnProperty.call(m.komponenten, oldName)) {
+        m.komponenten[newName] = m.komponenten[oldName];
+        delete m.komponenten[oldName];
+      }
+    });
+  }
+  function migrateOptionName(typId, compName, oldName, newName) {
+    if (!oldName || oldName === newName) return;
+    moebel.forEach(m => {
+      if (m.typId !== typId || !m.komponenten) return;
+      if (m.komponenten[compName] === oldName) m.komponenten[compName] = newName;
+    });
+  }
+  function migrateZusatzName(typId, oldName, newName) {
+    if (!oldName || oldName === newName) return;
+    moebel.forEach(m => {
+      if (m.typId !== typId) return;
+      (m.zusaetze || []).forEach(z => { if (z.name === oldName) z.name = newName; });
+    });
+  }
+
+  function defaultKomponenten(typ) {
+    const out = {};
+    (typ.komponenten || []).forEach(comp => {
+      const keine = (comp.optionen || []).find(o => o.name === "Keine");
+      out[comp.name] = keine ? keine.name : (comp.optionen[0] ? comp.optionen[0].name : "");
+    });
+    return out;
+  }
+
   function initData() {
     moebel = [
       {
-        id: uid(),
-        bezeichnung: "K\u00fcchenunterschrank",
-        qm: 3.2,
-        korpus: "Korpus Dekor",
-        front: "Farblack",
+        id: uid(), typId: "schrank", bezeichnung: "Küchenunterschrank", qm: 3.2,
+        komponenten: { Korpus: "Dekor", Front: "Farblack" },
         zusaetze: [
           { id: uid(), name: "Innenschublade M", menge: 3 },
           { id: uid(), name: "Auszug", menge: 1 },
-          { id: uid(), name: "Sockel", menge: 4 },
-        ],
+          { id: uid(), name: "Sockel", menge: 4 }
+        ]
       },
       {
-        id: uid(),
-        bezeichnung: "Sideboard Wohnzimmer",
-        qm: 2.8,
-        korpus: "Korpus Furnier",
-        front: "Massivholz",
+        id: uid(), typId: "schrank", bezeichnung: "Sideboard Wohnzimmer", qm: 2.8,
+        komponenten: { Korpus: "Furnier", Front: "Massivholz" },
         zusaetze: [
-          { id: uid(), name: "Innenschublade L", menge: 2 },
-        ],
+          { id: uid(), name: "Innenschublade L", menge: 2 }
+        ]
       },
       {
-        id: uid(),
-        bezeichnung: "Kleiderschrank Schlafzimmer",
-        qm: 4.5,
-        korpus: "Korpus Furnier",
-        front: "Furnier",
+        id: uid(), typId: "decke", bezeichnung: "Akustikdecke Wohnzimmer", qm: 24,
+        komponenten: { Korpus: "Furnier" },
         zusaetze: [
-          { id: uid(), name: "Beleuchtung", menge: 1 },
-          { id: uid(), name: "Einlegeboden", menge: 6 },
-        ],
-      },
+          { id: uid(), name: "Ausschnitte", menge: 6 },
+          { id: uid(), name: "Beleuchtung", menge: 1 }
+        ]
+      }
     ];
   }
 
-  // ---- Calculation ----
-  const MWST_PCT = 22;
-
   function calcMoebel(m) {
-    const korpusItem = findItem("korpus", m.korpus);
-    const frontItem = findItem("front", m.front);
-    const korpusE = (m.qm || 0) * (korpusItem ? korpusItem.preis : 0);
-    const frontE = (m.qm || 0) * (frontItem ? frontItem.preis : 0);
+    const typ = findTyp(m.typId);
+    const komponenten = {};
+    let komponentenSum = 0;
+    if (typ) {
+      (typ.komponenten || []).forEach(comp => {
+        const sel = m.komponenten ? m.komponenten[comp.name] : null;
+        const opt = findOption(comp, sel);
+        const preis = opt ? opt.preis : 0;
+        const summe = (m.qm || 0) * preis;
+        komponenten[comp.name] = summe;
+        komponentenSum += summe;
+      });
+    }
     let zusatzSum = 0;
     (m.zusaetze || []).forEach(z => {
-      const item = findZusatz(z.name);
-      const preis = item ? item.preis : 0;
-      const summe = (z.menge || 0) * preis;
-      z._summe = summe;
-      z._einheit = item ? item.einheit : "";
-      z._einzelpreis = preis;
+      let preis = 0, art = "stueck", summe = 0;
+      if (typ) {
+        const def = findZusatzDef(typ, z.name);
+        if (def) {
+          preis = def.preis;
+          art = def.mengeArt;
+          if (art === "flaeche") summe = (m.qm || 0) * preis;
+          else if (art === "pauschal") summe = preis;
+          else summe = (z.menge || 0) * preis;
+        }
+      }
+      z._mengeArt = art; z._einzelpreis = preis; z._summe = summe;
       zusatzSum += summe;
     });
-    return {
-      korpusE, frontE, zusatzSum,
-      gesamt: korpusE + frontE + zusatzSum,
-    };
+    return { komponenten: komponenten, komponentenSum: komponentenSum, zusatzSum: zusatzSum, gesamt: komponentenSum + zusatzSum };
   }
 
   function calc() {
@@ -568,79 +742,112 @@
       zusaetzeGesamt += c.zusatzSum;
     });
     const netto = moebelGesamt;
-    const mwstPct = MWST_PCT;
     const mwstBetrag = netto * mwstPct / 100;
     const endpreis = netto + mwstBetrag;
-    return { moebelGesamt, zusaetzeGesamt, netto, mwstPct, mwstBetrag, endpreis };
+    return { moebelGesamt: moebelGesamt, zusaetzeGesamt: zusaetzeGesamt, netto: netto, mwstPct: mwstPct, mwstBetrag: mwstBetrag, endpreis: endpreis };
   }
 
-  // ---- Rendering: Möbel rows ----
   function renderMoebel() {
     const list = document.getElementById("moebelList");
     list.innerHTML = "";
-    moebel.forEach((m) => {
-      list.appendChild(renderMoebelCard(m));
-    });
-    document.getElementById("moebelCount").textContent = moebel.length ? moebel.length + " St\u00fcck" : "";
+    moebel.forEach(m => list.appendChild(renderMoebelCard(m)));
+    document.getElementById("moebelCount").textContent = moebel.length ? moebel.length + " Stück" : "";
     renderEndpreis();
+  }
+
+  function componentSelect(comp, selected) {
+    const opts = (comp.optionen || []).map(o => {
+      const label = `${o.name} (${o.preis} €/m²)`;
+      return `<option value="${escapeHtml(o.name)}"${o.name === selected ? " selected" : ""}>${escapeHtml(label)}</option>`;
+    }).join("");
+    return `<select data-f="comp" data-comp="${escapeHtml(comp.name)}">${opts}</select>`;
   }
 
   function renderMoebelCard(m) {
     const c = m._calc || calcMoebel(m);
+    const typ = findTyp(m.typId);
     const row = document.createElement("div");
     row.className = "moebel-row";
     row.dataset.id = m.id;
+    if (m.eingeklappt) row.classList.add("eingeklappt");
+
+    const typeOpts = moebelTypen.map(t =>
+      `<option value="${escapeHtml(t.id)}"${t.id === m.typId ? " selected" : ""}>${escapeHtml(t.name || t.id)}</option>`
+    ).join("");
+    const typSelect = typ
+      ? `<select data-f="typId">${typeOpts}</select>`
+      : `<select data-f="typId"><option value="" selected>— Typ fehlt —</option>${typeOpts}</select>`;
+
+    const compFields = typ
+      ? (typ.komponenten || []).map(comp =>
+          `<div class="detail-field field-comp">
+             <div class="detail-label">${escapeHtml(comp.name)}</div>
+             ${componentSelect(comp, m.komponenten ? m.komponenten[comp.name] : null)}
+           </div>`
+        ).join("")
+      : "";
+
+    const priceLines = typ
+      ? (typ.komponenten || []).map(comp =>
+          `<span class="sub"><span class="plabel">${escapeHtml(comp.name)}</span>
+           <span data-v="compSum" data-comp="${escapeHtml(comp.name)}">${fmt(c.komponenten[comp.name] || 0)}</span></span>`
+        ).join("")
+      : "";
+
     row.innerHTML = `
       <div class="moebel-top">
+        <button class="collapse-btn" data-act="toggle-collapse" title="${m.eingeklappt ? "Aufklappen" : "Einklappen"}">${m.eingeklappt ? "&#9656;" : "&#9662;"}</button>
         <input type="text" class="bez-input" data-f="bezeichnung" value="${escapeHtml(m.bezeichnung)}" placeholder="Bezeichnung">
+        <div class="typ-field"><div class="detail-label">Typ</div>${typSelect}</div>
         <div class="gesamtpreis">
           <span class="glabel">Gesamt</span>
           <span class="gval" data-v="gesamt">${fmt(c.gesamt)}</span>
         </div>
-        <button class="del-x" data-act="del-moebel" title="M&ouml;bel l&ouml;schen">&times;</button>
+        <button class="del-x" data-act="del-moebel" title="Möbel löschen">&times;</button>
       </div>
       <div class="moebel-detail">
-        <div class="detail-field">
+        <div class="detail-field field-m2">
           <div class="detail-label">m²</div>
           <input type="number" data-f="qm" step="0.01" min="0" value="${m.qm}">
         </div>
-        <div class="detail-field">
-          <div class="detail-label">Korpus</div>
-          ${selectHtml("korpus", m.korpus)}
-        </div>
-        <div class="detail-field">
-          <div class="detail-label">Front</div>
-          ${selectHtml("front", m.front)}
-        </div>
-        <div class="moebel-prices-inline">
-          <span class="sub"><span class="plabel">Korpus</span><span data-v="korpusE">${fmt(c.korpusE)}</span></span>
-          <span class="sep">&middot;</span>
-          <span class="sub"><span class="plabel">Front</span><span data-v="frontE">${fmt(c.frontE)}</span></span>
-        </div>
+        ${compFields}
+        <div class="moebel-prices-inline">${priceLines}</div>
       </div>
       <div class="zusatz-list" data-v="zusaetze"></div>
     `;
 
+    if (!typ) {
+      const note = document.createElement("div");
+      note.className = "hint";
+      note.style.marginTop = "10px";
+      note.textContent = "Typ nicht mehr verfügbar — bitte einen Typ auswählen.";
+      row.querySelector(".moebel-detail").appendChild(note);
+    }
+
     const zusatzContainer = row.querySelector('[data-v="zusaetze"]');
-    if ((m.zusaetze || []).length > 0) {
+    if (typ && (typ.zusaetze || []).length) {
       const head = document.createElement("div");
       head.className = "zusatz-head";
       head.innerHTML = `<span>Zusatz</span><span>Menge</span><span class="sum-head">Summe</span><span></span>`;
       zusatzContainer.appendChild(head);
     }
-    (m.zusaetze || []).forEach(z => zusatzContainer.appendChild(renderZusatzRow(z)));
-    const addBtn = document.createElement("button");
-    addBtn.className = "add-zusatz-btn";
-    addBtn.textContent = "+ Zusatz";
-    addBtn.addEventListener("click", () => {
-      const items = zusatzItems();
-      const first = items[0];
-      const z = { id: uid(), name: first ? first.name : "", menge: 1 };
-      m.zusaetze.push(z);
-      renderMoebel();
-      focusZusatzField(m.id, z.id);
-    });
-    zusatzContainer.appendChild(addBtn);
+    (m.zusaetze || []).forEach(z => zusatzContainer.appendChild(renderZusatzRow(z, m)));
+    if (typ && (typ.zusaetze || []).length) {
+      const addBtn = document.createElement("button");
+      addBtn.className = "add-zusatz-btn";
+      addBtn.textContent = "+ Zusatz";
+      addBtn.addEventListener("click", () => {
+        const first = typ.zusaetze[0];
+        const def = first || null;
+        const menge = def && def.mengeArt === "pauschal" ? 1 : 1;
+        const z = { id: uid(), name: first ? first.name : "", menge: menge };
+        m.zusaetze.push(z);
+        saveProject();
+        renderMoebel();
+        focusZusatzField(m.id, z.id);
+      });
+      zusatzContainer.appendChild(addBtn);
+    }
 
     row.querySelectorAll("input, select").forEach(el => {
       el.addEventListener("input", onMoebelInput);
@@ -648,40 +855,61 @@
     });
     row.querySelector('[data-act="del-moebel"]').addEventListener("click", () => {
       moebel = moebel.filter(x => x.id !== m.id);
+      saveProject();
       renderMoebel();
+    });
+    row.querySelector('[data-act="toggle-collapse"]').addEventListener("click", () => {
+      m.eingeklappt = !m.eingeklappt;
+      row.classList.toggle("eingeklappt", m.eingeklappt);
+      const btn = row.querySelector('[data-act="toggle-collapse"]');
+      btn.innerHTML = m.eingeklappt ? "&#9656;" : "&#9662;";
+      btn.title = m.eingeklappt ? "Aufklappen" : "Einklappen";
+      saveProject();
     });
     return row;
   }
 
-  function renderZusatzRow(z) {
-    const item = findZusatz(z.name);
-    const einheit = item ? item.einheit : "";
-    const einzelpreis = item ? item.preis : 0;
-    const summe = (z.menge || 0) * einzelpreis;
-    z._einheit = einheit; z._einzelpreis = einzelpreis; z._summe = summe;
+  function zusatzNameSelect(typ, selected) {
+    if (!typ) return `<select disabled><option selected>${escapeHtml(selected)}</option></select>`;
+    const opts = (typ.zusaetze || []).map(z => {
+      const einh = einheitForMengetArt(z.mengeArt);
+      const label = `${z.name} (${z.preis} ${einh})`;
+      return `<option value="${escapeHtml(z.name)}"${z.name === selected ? " selected" : ""}>${escapeHtml(label)}</option>`;
+    }).join("");
+    return `<select data-zf="name">${opts}</select>`;
+  }
+
+  function renderZusatzRow(z, m) {
+    const typ = findTyp(m.typId);
+    const def = typ ? findZusatzDef(typ, z.name) : null;
+    const art = def ? def.mengeArt : "stueck";
+    const preis = def ? def.preis : 0;
+    const einheit = einheitForMengetArt(art);
+    const summe = art === "flaeche" ? (m.qm || 0) * preis : art === "pauschal" ? preis : (z.menge || 0) * preis;
+    z._mengeArt = art; z._einzelpreis = preis; z._summe = summe;
+    const showMenge = art !== "pauschal";
 
     const row = document.createElement("div");
     row.className = "zusatz-row";
     row.dataset.id = z.id;
     row.innerHTML = `
-      <div>${zusatzSelectHtml(z.name)}</div>
+      <div>${zusatzNameSelect(typ, z.name)}</div>
       <div class="menge-wrap">
-        <input type="number" data-zf="menge" step="0.01" min="0" value="${z.menge}">
+        ${showMenge ? `<input type="number" data-zf="menge" step="0.01" min="0" value="${z.menge || 0}">` : `<span></span>`}
         <span class="einheit-suffix" data-zv="einheit">${escapeHtml(einheit)}</span>
       </div>
       <div class="sum" data-zv="summe">${fmt(summe)}</div>
-      <button class="del-x" data-zact="del" title="Zusatz l&ouml;schen">&times;</button>
+      <button class="del-x" data-zact="del" title="Zusatz löschen">&times;</button>
     `;
+
     row.querySelectorAll("input, select").forEach(el => {
       el.addEventListener("input", onZusatzInput);
       el.addEventListener("change", onZusatzInput);
     });
     row.querySelector('[data-zact="del"]').addEventListener("click", () => {
-      const m = findMoebelByZusatzRow(row);
-      if (m) {
-        m.zusaetze = m.zusaetze.filter(x => x.id !== z.id);
-        renderMoebel();
-      }
+      m.zusaetze = (m.zusaetze || []).filter(x => x.id !== z.id);
+      saveProject();
+      renderMoebel();
     });
     return row;
   }
@@ -699,10 +927,34 @@
     const f = e.target.dataset.f;
     if (f === "bezeichnung") m.bezeichnung = e.target.value;
     else if (f === "qm") m.qm = parseFloat(e.target.value) || 0;
-    else if (f === "korpus") m.korpus = e.target.value;
-    else if (f === "front") m.front = e.target.value;
+    else if (f === "typId") { handleTypChange(row, m, e.target.value, e.target); return; }
+    else if (f === "comp") {
+      if (!m.komponenten) m.komponenten = {};
+      m.komponenten[e.target.dataset.comp] = e.target.value;
+    } else {
+      return;
+    }
+    saveProject();
+    row.querySelectorAll(".zusatz-row").forEach(zrow => {
+      const z = m.zusaetze.find(x => x.id === zrow.dataset.id);
+      if (z) updateZusatzSums(zrow, z, m);
+    });
     updateCardCalc(row, m);
     renderEndpreis();
+  }
+
+  function handleTypChange(row, m, newId, selectEl) {
+    const typ = findTyp(newId);
+    if (!typ) return;
+    if ((m.zusaetze || []).length && !confirm("Typ ändern? Vorhandene Zusätze werden entfernt.")) {
+      selectEl.value = m.typId;
+      return;
+    }
+    m.typId = typ.id;
+    m.komponenten = defaultKomponenten(typ);
+    m.zusaetze = [];
+    saveProject();
+    renderMoebel();
   }
 
   function onZusatzInput(e) {
@@ -711,24 +963,40 @@
     if (!m) return;
     const z = m.zusaetze.find(x => x.id === zrow.dataset.id);
     if (!z) return;
-    if (e.target.dataset.zf === "menge") z.menge = parseFloat(e.target.value) || 0;
-    else if (e.target.tagName === "SELECT") z.name = e.target.value;
-    const item = findZusatz(z.name);
-    const einheit = item ? item.einheit : "";
-    const einzelpreis = item ? item.preis : 0;
-    const summe = (z.menge || 0) * einzelpreis;
-    zrow.querySelector('[data-zv="einheit"]').textContent = einheit;
+    const typ = findTyp(m.typId);
+    if (e.target.dataset.zf === "menge") {
+      z.menge = parseFloat(e.target.value) || 0;
+      updateZusatzSums(zrow, z, m);
+      saveProject();
+      updateCardCalc(zrow.closest(".moebel-row"), m);
+      renderEndpreis();
+    } else if (e.target.tagName === "SELECT" && e.target.dataset.zf === "name") {
+      z.name = e.target.value;
+      const def = typ ? findZusatzDef(typ, z.name) : null;
+      if (def && def.mengeArt === "pauschal") z.menge = 1;
+      const newRow = renderZusatzRow(z, m);
+      zrow.replaceWith(newRow);
+      saveProject();
+      updateCardCalc(newRow.closest(".moebel-row"), m);
+      renderEndpreis();
+    }
+  }
+
+  function updateZusatzSums(zrow, z, m) {
+    const typ = findTyp(m.typId);
+    const def = typ ? findZusatzDef(typ, z.name) : null;
+    const art = def ? def.mengeArt : "stueck";
+    const preis = def ? def.preis : 0;
+    const summe = art === "flaeche" ? (m.qm || 0) * preis : art === "pauschal" ? preis : (z.menge || 0) * preis;
     zrow.querySelector('[data-zv="summe"]').textContent = fmt(summe);
-    const moebelRow = e.target.closest(".moebel-row");
-    updateCardCalc(moebelRow, m);
-    renderEndpreis();
   }
 
   function updateCardCalc(row, m) {
     const c = calcMoebel(m);
     m._calc = c;
-    row.querySelector('[data-v="korpusE"]').textContent = fmt(c.korpusE);
-    row.querySelector('[data-v="frontE"]').textContent = fmt(c.frontE);
+    row.querySelectorAll('[data-v="compSum"]').forEach(el => {
+      el.textContent = fmt(c.komponenten[el.dataset.comp] || 0);
+    });
     row.querySelector('[data-v="gesamt"]').textContent = fmt(c.gesamt);
   }
 
@@ -747,90 +1015,302 @@
     else { el.textContent = "Unbenanntes Projekt"; el.className = "projekt-name empty"; }
   }
 
-  // ---- Dropdown HTML ----
-  function selectHtml(cat, selected) {
-    const opts = preisliste[cat].map(i => {
-      const label = `${i.name} (${i.preis} ${i.einheit})`;
-      return `<option value="${escapeHtml(i.name)}" ${i.name === selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
-    }).join("");
-    return `<select data-f="${cat}">${opts}</select>`;
+  function renderMwstLabel() {
+    document.getElementById("mwstLabel").textContent = "MwSt. " + mwstPct + "%";
   }
 
-  function zusatzSelectHtml(selected) {
-    const opts = zusatzItems().map(i => {
-      const label = `${i.name} (${i.preis} ${i.einheit})`;
-      return `<option value="${escapeHtml(i.name)}" ${i.name === selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
-    }).join("");
-    return `<select>${opts}</select>`;
-  }
-
-  // ---- Preisliste editor ----
-  function renderPreislisteEditor() {
-    const container = document.getElementById("preislisteEdit");
+  function renderTypeEditor() {
+    const container = document.getElementById("typEdit");
     container.innerHTML = "";
-    Object.keys(preisliste).forEach(cat => {
-      const wrap = document.createElement("div");
-      wrap.className = "preisliste-cat";
-      wrap.innerHTML = `<div class="cat-name">${catLabels[cat] || cat}</div>`;
-      const rows = document.createElement("div");
-      rows.className = "preisliste-rows";
-      preisliste[cat].forEach((item, idx) => {
-        const row = document.createElement("div");
-        row.className = "preis-item";
-        row.innerHTML = `
-          <input type="text" data-pf="name" value="${escapeHtml(item.name)}">
-          <input type="text" data-pf="einheit" value="${escapeHtml(item.einheit)}">
-          <input type="number" data-pf="preis" step="0.01" min="0" value="${item.preis}">
-        `;
-        row.querySelectorAll("input").forEach(inp => {
-          inp.addEventListener("input", (e) => onPreislisteInput(e, cat, idx));
-        });
-        rows.appendChild(row);
-      });
-      wrap.appendChild(rows);
-      container.appendChild(wrap);
-    });
+    moebelTypen.forEach(typ => container.appendChild(renderTypBlock(typ)));
+
+    const actions = document.createElement("div");
+    actions.className = "typ-actions";
+    const addBtn = document.createElement("button");
+    addBtn.className = "btn sm";
+    addBtn.textContent = "+ Möbeltyp";
+    addBtn.addEventListener("click", addTyp);
+    const resetBtn = document.createElement("button");
+    resetBtn.className = "btn sm secondary";
+    resetBtn.textContent = "Auf Standard zurücksetzen";
+    resetBtn.addEventListener("click", resetCatalog);
+    actions.appendChild(addBtn);
+    actions.appendChild(resetBtn);
+    container.appendChild(actions);
   }
 
-  function onPreislisteInput(e, cat, idx) {
-    const f = e.target.dataset.pf;
-    const item = preisliste[cat][idx];
-    if (f === "name") item.name = e.target.value;
-    else if (f === "einheit") item.einheit = e.target.value;
-    else if (f === "preis") item.preis = parseFloat(e.target.value) || 0;
+  function sectionLabel(text) {
+    const el = document.createElement("div");
+    el.className = "typ-section-label";
+    el.textContent = text;
+    return el;
+  }
+
+  function renderTypBlock(typ) {
+    const block = document.createElement("div");
+    block.className = "typ-block";
+    block.dataset.tid = typ.id;
+    if (eingeklappteTypen.has(typ.id)) block.classList.add("eingeklappt");
+
+    const head = document.createElement("div");
+    head.className = "typ-block-head";
+    const collapseBtn = document.createElement("button");
+    collapseBtn.className = "collapse-btn";
+    collapseBtn.innerHTML = eingeklappteTypen.has(typ.id) ? "&#9656;" : "&#9662;";
+    collapseBtn.title = eingeklappteTypen.has(typ.id) ? "Aufklappen" : "Einklappen";
+    collapseBtn.addEventListener("click", () => {
+      const geklappt = !eingeklappteTypen.has(typ.id);
+      if (geklappt) eingeklappteTypen.add(typ.id);
+      else eingeklappteTypen.delete(typ.id);
+      block.classList.toggle("eingeklappt", geklappt);
+      collapseBtn.innerHTML = geklappt ? "&#9656;" : "&#9662;";
+      collapseBtn.title = geklappt ? "Aufklappen" : "Einklappen";
+      saveTypCollapse();
+    });
+    const nameInp = document.createElement("input");
+    nameInp.type = "text";
+    nameInp.value = typ.name;
+    nameInp.placeholder = "Typname";
+    nameInp.className = "typ-name";
+    nameInp.addEventListener("input", () => {
+      typ.name = nameInp.value;
+      saveCatalog();
+      renderMoebel();
+    });
+    const delBtn = document.createElement("button");
+    delBtn.className = "del-x";
+    delBtn.innerHTML = "&times;";
+    delBtn.title = "Typ löschen";
+    delBtn.addEventListener("click", () => {
+      if (!confirm(`Möbeltyp „${typ.name || ""}“ löschen?`)) return;
+      moebelTypen = moebelTypen.filter(t => t.id !== typ.id);
+      eingeklappteTypen.delete(typ.id);
+      saveTypCollapse();
+      saveCatalog();
+      renderTypeEditor();
+      renderMoebel();
+    });
+    head.appendChild(collapseBtn);
+    head.appendChild(nameInp);
+    head.appendChild(delBtn);
+    block.appendChild(head);
+
+    const compSection = document.createElement("div");
+    compSection.className = "typ-section";
+    compSection.appendChild(sectionLabel("Komponenten"));
+    (typ.komponenten || []).forEach(comp => compSection.appendChild(renderCompBlock(typ, comp)));
+    const addCompBtn = document.createElement("button");
+    addCompBtn.className = "mini-add-btn";
+    addCompBtn.textContent = "+ Komponente";
+    addCompBtn.addEventListener("click", () => {
+      typ.komponenten.push({ name: "Neue Komponente", optionen: [] });
+      saveCatalog();
+      renderTypeEditor();
+      renderMoebel();
+    });
+    compSection.appendChild(addCompBtn);
+    block.appendChild(compSection);
+
+    const zusSection = document.createElement("div");
+    zusSection.className = "typ-section";
+    zusSection.appendChild(sectionLabel("Zusätze"));
+    (typ.zusaetze || []).forEach(z => zusSection.appendChild(renderZusatzDefRow(typ, z)));
+    const addZusBtn = document.createElement("button");
+    addZusBtn.className = "mini-add-btn";
+    addZusBtn.textContent = "+ Zusatz";
+    addZusBtn.addEventListener("click", () => {
+      typ.zusaetze.push({ name: "Neuer Zusatz", mengeArt: "stueck", preis: 0 });
+      saveCatalog();
+      renderTypeEditor();
+      renderMoebel();
+    });
+    zusSection.appendChild(addZusBtn);
+    block.appendChild(zusSection);
+    return block;
+  }
+
+  function renderCompBlock(typ, comp) {
+    const block = document.createElement("div");
+    block.className = "comp-block";
+    const head = document.createElement("div");
+    head.className = "comp-block-head";
+    const nameInp = document.createElement("input");
+    nameInp.type = "text";
+    nameInp.value = comp.name;
+    nameInp.placeholder = "Komponente";
+    nameInp.addEventListener("input", () => {
+      const old = comp.name;
+      comp.name = nameInp.value;
+      migrateComponentName(typ.id, old, comp.name);
+      saveCatalog();
+      renderMoebel();
+    });
+    const delBtn = document.createElement("button");
+    delBtn.className = "del-x";
+    delBtn.innerHTML = "&times;";
+    delBtn.title = "Komponente löschen";
+    delBtn.addEventListener("click", () => {
+      typ.komponenten = typ.komponenten.filter(c => c !== comp);
+      saveCatalog();
+      renderTypeEditor();
+      renderMoebel();
+    });
+    head.appendChild(nameInp);
+    head.appendChild(delBtn);
+    block.appendChild(head);
+
+    (comp.optionen || []).forEach(opt => block.appendChild(renderOptionRow(typ, comp, opt)));
+    const addOptBtn = document.createElement("button");
+    addOptBtn.className = "mini-add-btn";
+    addOptBtn.textContent = "+ Option";
+    addOptBtn.addEventListener("click", () => {
+      comp.optionen.push({ name: "Neue Option", preis: 0 });
+      saveCatalog();
+      renderTypeEditor();
+      renderMoebel();
+    });
+    block.appendChild(addOptBtn);
+    return block;
+  }
+
+  function renderOptionRow(typ, comp, opt) {
+    const row = document.createElement("div");
+    row.className = "opt-row";
+    const nameInp = document.createElement("input");
+    nameInp.type = "text";
+    nameInp.value = opt.name;
+    nameInp.placeholder = "Name";
+    nameInp.addEventListener("input", () => {
+      const old = opt.name;
+      opt.name = nameInp.value;
+      migrateOptionName(typ.id, comp.name, old, opt.name);
+      saveCatalog();
+      renderMoebel();
+    });
+    const preisInp = document.createElement("input");
+    preisInp.type = "number";
+    preisInp.step = "0.01";
+    preisInp.min = "0";
+    preisInp.value = opt.preis;
+    preisInp.addEventListener("input", () => {
+      opt.preis = parseFloat(preisInp.value) || 0;
+      saveCatalog();
+      renderMoebel();
+    });
+    const delBtn = document.createElement("button");
+    delBtn.className = "del-x";
+    delBtn.innerHTML = "&times;";
+    delBtn.title = "Option löschen";
+    delBtn.addEventListener("click", () => {
+      comp.optionen = comp.optionen.filter(o => o !== opt);
+      saveCatalog();
+      renderTypeEditor();
+      renderMoebel();
+    });
+    row.appendChild(nameInp);
+    row.appendChild(preisInp);
+    row.appendChild(delBtn);
+    return row;
+  }
+
+  function renderZusatzDefRow(typ, z) {
+    const row = document.createElement("div");
+    row.className = "zusatzdef-row";
+    const nameInp = document.createElement("input");
+    nameInp.type = "text";
+    nameInp.value = z.name;
+    nameInp.placeholder = "Name";
+    nameInp.addEventListener("input", () => {
+      const old = z.name;
+      z.name = nameInp.value;
+      migrateZusatzName(typ.id, old, z.name);
+      saveCatalog();
+      renderMoebel();
+    });
+    const artSel = document.createElement("select");
+    MENGE_ARTEN.forEach(a => {
+      const o = document.createElement("option");
+      o.value = a.value;
+      o.textContent = a.label;
+      if (a.value === z.mengeArt) o.selected = true;
+      artSel.appendChild(o);
+    });
+    artSel.addEventListener("change", () => {
+      z.mengeArt = artSel.value;
+      saveCatalog();
+      renderMoebel();
+    });
+    const preisInp = document.createElement("input");
+    preisInp.type = "number";
+    preisInp.step = "0.01";
+    preisInp.min = "0";
+    preisInp.value = z.preis;
+    preisInp.addEventListener("input", () => {
+      z.preis = parseFloat(preisInp.value) || 0;
+      saveCatalog();
+      renderMoebel();
+    });
+    const delBtn = document.createElement("button");
+    delBtn.className = "del-x";
+    delBtn.innerHTML = "&times;";
+    delBtn.title = "Zusatz löschen";
+    delBtn.addEventListener("click", () => {
+      typ.zusaetze = typ.zusaetze.filter(x => x !== z);
+      saveCatalog();
+      renderTypeEditor();
+      renderMoebel();
+    });
+    row.appendChild(nameInp);
+    row.appendChild(artSel);
+    row.appendChild(preisInp);
+    row.appendChild(delBtn);
+    return row;
+  }
+
+  function addTyp() {
+    const t = { id: uid(), name: "", komponenten: [{ name: "Korpus", optionen: [] }], zusaetze: [] };
+    moebelTypen.push(t);
+    saveCatalog();
+    renderTypeEditor();
+    renderMoebel();
+    const inp = document.querySelector(`.typ-block[data-tid="${t.id}"] .typ-name`);
+    if (inp) inp.focus();
+  }
+
+  function resetCatalog() {
+    if (!confirm("Möbeltypen auf Standard zurücksetzen? Eigene Änderungen gehen verloren. Das Projekt bleibt erhalten.")) return;
+    moebelTypen = JSON.parse(JSON.stringify(defaultMoebelTypen));
+    saveCatalog();
+    renderTypeEditor();
     renderMoebel();
   }
 
-  // ---- Add Möbel ----
   function addMoebel() {
-    const k = preisliste.korpus[0];
-    const f = preisliste.front[0];
-    const m = {
-      id: uid(), bezeichnung: "", qm: 0, korpus: k ? k.name : "", front: f ? f.name : "",
-      zusaetze: [],
-    };
+    const typ = moebelTypen[0];
+    if (!typ) { alert("Bitte zuerst einen Möbeltyp anlegen."); return; }
+    const m = { id: uid(), typId: typ.id, bezeichnung: "", qm: 0, komponenten: defaultKomponenten(typ), zusaetze: [] };
     moebel.push(m);
+    saveProject();
     renderMoebel();
     focusMoebelBez(m.id);
   }
 
   function focusMoebelBez(id) {
-    const row = document.querySelector('.moebel-row[data-id="' + id + '"]');
+    const row = document.querySelector(`.moebel-row[data-id="${id}"]`);
     if (!row) return;
-    const bez = row.querySelector('.bez-input');
+    const bez = row.querySelector(".bez-input");
     if (bez) bez.focus();
   }
 
   function focusZusatzField(moebelId, zusatzId) {
-    const row = document.querySelector('.moebel-row[data-id="' + moebelId + '"]');
+    const row = document.querySelector(`.moebel-row[data-id="${moebelId}"]`);
     if (!row) return;
-    const zrow = row.querySelector('.zusatz-row[data-id="' + zusatzId + '"]');
+    const zrow = row.querySelector(`.zusatz-row[data-id="${zusatzId}"]`);
     if (!zrow) return;
     const menge = zrow.querySelector('input[data-zf="menge"]');
     if (menge) { menge.focus(); menge.select(); }
   }
 
-  // ---- Neu modal ----
   function openNeuModal() {
     const modal = document.getElementById("neuModal");
     const input = document.getElementById("neuNameInput");
@@ -844,28 +1324,30 @@
   function confirmNeu() {
     const name = document.getElementById("neuNameInput").value.trim() || "Neues Projekt";
     projektName = name;
+    mwstPct = 22;
     moebel = [];
     closeNeuModal();
+    saveProject();
     renderProjektName();
+    renderMwstLabel();
     renderMoebel();
   }
 
-  // ---- JSON export ----
   function exportJson() {
     const data = {
       app: "moebelkalkulation",
-      version: 1,
+      version: 2,
       projektName: projektName,
-      mwstPct: MWST_PCT,
+      mwstPct: mwstPct,
+      moebelTypen: JSON.parse(JSON.stringify(moebelTypen)),
       moebel: moebel.map(m => ({
         id: m.id,
+        typId: m.typId,
         bezeichnung: m.bezeichnung,
         qm: m.qm,
-        korpus: m.korpus,
-        front: m.front,
-        zusaetze: (m.zusaetze || []).map(z => ({ id: z.id, name: z.name, menge: z.menge })),
-      })),
-      preisliste: JSON.parse(JSON.stringify(preisliste)),
+        komponenten: Object.assign({}, m.komponenten),
+        zusaetze: (m.zusaetze || []).map(z => ({ id: z.id, name: z.name, menge: z.menge }))
+      }))
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -878,7 +1360,29 @@
     URL.revokeObjectURL(url);
   }
 
-  // ---- JSON import ----
+  function importMoebel(m) {
+    const typId = m.typId || "schrank";
+    let komponenten = {};
+    if (m.komponenten && typeof m.komponenten === "object") komponenten = Object.assign({}, m.komponenten);
+    if (m.korpus !== undefined) {
+      let v = String(m.korpus);
+      if (v.indexOf("Korpus ") === 0) v = v.slice(7);
+      komponenten["Korpus"] = v;
+    }
+    if (m.front !== undefined) komponenten["Front"] = String(m.front);
+    return {
+      id: m.id || uid(),
+      typId: String(typId),
+      bezeichnung: String(m.bezeichnung || ""),
+      qm: Number(m.qm) || 0,
+      komponenten: komponenten,
+      zusaetze: Array.isArray(m.zusaetze)
+        ? m.zusaetze.map(z => ({ id: z.id || uid(), name: String(z.name || ""), menge: Number(z.menge) || 0 }))
+        : [],
+      eingeklappt: !!m.eingeklappt
+    };
+  }
+
   function importJson(file) {
     const reader = new FileReader();
     reader.onload = function (e) {
@@ -889,34 +1393,14 @@
           return;
         }
         if (typeof data.projektName === "string") projektName = data.projektName;
-
-        if (data.preisliste && typeof data.preisliste === "object") {
-          const merged = {};
-          Object.keys(defaultPreisliste).forEach(k => {
-            merged[k] = Array.isArray(data.preisliste[k])
-              ? data.preisliste[k].map(i => ({
-                  name: String(i.name || ""),
-                  einheit: String(i.einheit || ""),
-                  preis: Number(i.preis) || 0,
-                }))
-              : JSON.parse(JSON.stringify(defaultPreisliste[k]));
-          });
-          preisliste = merged;
-          renderPreislisteEditor();
-        }
-
-        moebel = data.moebel.map(m => ({
-          id: m.id || uid(),
-          bezeichnung: String(m.bezeichnung || ""),
-          qm: Number(m.qm) || 0,
-          korpus: String(m.korpus || ""),
-          front: String(m.front || ""),
-          zusaetze: Array.isArray(m.zusaetze)
-            ? m.zusaetze.map(z => ({ id: z.id || uid(), name: String(z.name || ""), menge: Number(z.menge) || 0 }))
-            : [],
-        }));
-
+        if (typeof data.mwstPct === "number") mwstPct = data.mwstPct;
+        if (Array.isArray(data.moebelTypen)) moebelTypen = data.moebelTypen.map(normalizeTyp);
+        moebel = data.moebel.map(importMoebel);
+        saveCatalog();
+        saveProject();
         renderProjektName();
+        renderMwstLabel();
+        renderTypeEditor();
         renderMoebel();
       } catch (err) {
         console.error(err);
@@ -929,16 +1413,26 @@
     reader.readAsText(file);
   }
 
-  // ---- Print (native browser "Save as PDF") ----
   function printPdf() {
     window.print();
   }
 
-  // ---- Init ----
   function init() {
-    initData();
+    const savedCat = loadCatalog();
+    moebelTypen = savedCat ? savedCat.map(normalizeTyp) : JSON.parse(JSON.stringify(defaultMoebelTypen));
+    eingeklappteTypen = loadTypCollapse();
+    const savedProj = loadProject();
+    if (savedProj && Array.isArray(savedProj.moebel)) {
+      projektName = typeof savedProj.projektName === "string" ? savedProj.projektName : "Wohnungseinrichtung";
+      mwstPct = typeof savedProj.mwstPct === "number" ? savedProj.mwstPct : 22;
+      moebel = savedProj.moebel.map(importMoebel);
+    } else {
+      initData();
+    }
+
     renderProjektName();
-    renderPreislisteEditor();
+    renderMwstLabel();
+    renderTypeEditor();
     renderMoebel();
 
     document.getElementById("addMoebelBtn").addEventListener("click", addMoebel);
@@ -970,9 +1464,9 @@
       importInput.value = "";
     });
 
-    const toggle = document.getElementById("preislisteToggle");
-    const body = document.getElementById("preislisteBody");
-    const hint = document.getElementById("preislisteHint");
+    const toggle = document.getElementById("configToggle");
+    const body = document.getElementById("configBody");
+    const hint = document.getElementById("configHint");
     toggle.addEventListener("click", () => {
       const open = body.style.display !== "none";
       body.style.display = open ? "none" : "block";
