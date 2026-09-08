@@ -19,7 +19,11 @@ down so the next agent knows what goal a piece of work served and what was
 decided to get there.
 
 One file per intent in `docs/intent/`, named `YYYYMMDD-<slug>.md`. At least one
-per pull request. Written during the work. Immutable after PR.
+per pull request. Written during the work, not at the end. When a decision is
+made or changed mid-work, update the intent doc in the same commit as the
+code — not in a later pass. The doc and the diff ship together.
+
+Immutable after PR.
 
 See [the template](docs/intent/_TEMPLATE.md).
 
