@@ -123,9 +123,13 @@
     flex: 1; min-width: 0;
     background: var(--surface); border: 1px solid var(--line);
     border-radius: 14px;
-    box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 12px 32px rgba(15,23,42,0.05);
     padding: 22px 28px 32px;
     overflow-y: auto;
+  }
+  .card > * {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   /* ---- Card header (project + settings) ---- */
@@ -141,15 +145,6 @@
     background: #fff; cursor: pointer; color: var(--accent);
   }
   .menu-btn:hover { background: var(--accent-soft); }
-  .projekt-name {
-    flex: 1; min-width: 0;
-    font-size: 22px; font-weight: 700; letter-spacing: -0.015em;
-    color: var(--ink); background: transparent; border: 1px solid transparent;
-    border-radius: var(--radius-sm); padding: 6px 8px;
-    transition: border-color 0.12s, background 0.12s;
-  }
-  .projekt-name:hover { border-color: var(--line); background: var(--accent-soft); }
-  .projekt-name:focus { outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
   .card-head-total { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; }
   .endpreis-label {
     font-size: 10px; color: var(--muted); text-transform: uppercase;
@@ -174,132 +169,163 @@
     text-transform: none; letter-spacing: 0;
   }
 
-  /* ---- Inputs ---- */
+  /* ---- Inputs: plain by default, reveal chrome on hover/focus ---- */
   input[type="text"], input[type="number"], select {
     width: 100%; padding: 7px 8px;
-    border: 1px solid var(--line); border-radius: var(--radius-sm);
-    font: inherit; font-size: 14px; color: var(--fg); background: #fff;
-    transition: border-color 0.12s, box-shadow 0.12s;
+    border: 1px solid transparent; border-radius: var(--radius-sm);
+    font: inherit; font-size: 14px; color: var(--fg); background: transparent;
+    transition: border-color 0.12s, background 0.12s, box-shadow 0.12s, background-image 0.12s;
   }
   select {
     cursor: pointer; padding-right: 24px; appearance: none; -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='%2394a3b8' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E");
+    background-image: none;
     background-repeat: no-repeat; background-position: right 8px center;
   }
   input[type="number"] { text-align: right; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-  input:hover, select:hover { border-color: var(--line-strong); }
+  input:hover, select:hover {
+    border-color: var(--line-strong); background-color: #fff;
+  }
   input:focus, select:focus {
-    outline: none; border-color: var(--accent);
+    outline: none; border-color: var(--accent); background-color: #fff;
     box-shadow: 0 0 0 3px rgba(51,65,85,0.10);
   }
+  select:hover, select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='%2394a3b8' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E");
+  }
+
+  /* ---- Project title (needs to override base input) ---- */
+  input.projekt-name {
+    flex: 1; min-width: 0;
+    font-size: 26px; font-weight: 800; letter-spacing: -0.02em;
+    color: var(--ink); background: transparent; border: 1px solid transparent;
+    border-radius: var(--radius-sm); padding: 6px 8px;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  input.projekt-name:hover { border-color: var(--line); background-color: var(--accent-soft); }
+  input.projekt-name:focus { outline: none; border-color: var(--accent); background-color: #fff; box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
 
   /* ---- Möbel cards ---- */
-  .moebel-list { display: flex; flex-direction: column; gap: 12px; }
+  .moebel-list { display: flex; flex-direction: column; gap: 16px; }
   .moebel-row {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 16px 18px;
-    box-shadow: var(--shadow-sm);
-    transition: border-color 0.12s, box-shadow 0.12s;
+    background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: var(--radius); padding: 18px 20px;
+    transition: border-color 0.12s;
   }
-  .moebel-row:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+  .moebel-row:hover { border-color: var(--accent); }
 
   .moebel-top {
     display: flex; align-items: center; justify-content: space-between; gap: 14px;
     flex-wrap: wrap;
   }
-  .bez-input {
-    flex: 1; font-size: 17px; font-weight: 700; letter-spacing: -0.01em;
+  input.bez-input {
+    flex: 1; font-size: 20px; font-weight: 800; letter-spacing: -0.015em;
     padding: 7px 10px; border: 1px solid transparent; border-radius: var(--radius-sm);
-    background: transparent; color: var(--ink); line-height: 1.3;
+    background: transparent; color: var(--ink); line-height: 1.25;
     transition: border-color 0.12s, background 0.12s;
     min-width: 180px;
   }
-  .bez-input::placeholder { color: var(--muted-soft); font-weight: 500; font-size: 16px; }
-  .bez-input:hover { border-color: var(--line); background: var(--accent-soft); }
-  .bez-input:focus { outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
-  .moebel-top .typ-field { flex: 0 0 170px; display: flex; flex-direction: column; }
+  input.bez-input::placeholder { color: var(--muted-soft); font-weight: 700; font-size: 19px; }
+  input.bez-input:hover { border-color: var(--line); background-color: var(--accent-soft); }
+  input.bez-input:focus { outline: none; border-color: var(--accent); background-color: #fff; box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
   .moebel-top .gesamtpreis {
-    display: flex; align-items: baseline; gap: 8px; white-space: nowrap; flex-shrink: 0;
-    background: var(--accent-soft); padding: 7px 14px; border-radius: 999px;
+    display: flex; align-items: baseline; gap: 0; white-space: nowrap; flex-shrink: 0;
   }
-  .moebel-top .gesamtpreis .glabel {
-    font-size: 10px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: 0.08em; font-weight: 700;
-  }
+  .moebel-top .gesamtpreis .glabel { display: none; }
   .moebel-top .gesamtpreis .gval {
     font-size: 19px; font-weight: 800; color: var(--ink);
     font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
   }
 
   .moebel-detail {
-    display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-top: 12px;
+    margin-top: 4px;
+    display: flex; flex-direction: column; gap: 0;
   }
-  .detail-label {
-    font-size: 9px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.1em; color: var(--muted-soft); margin-bottom: 4px;
+  .detail-first-line {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 0;
   }
-  .detail-field { display: flex; flex-direction: column; }
-  .field-m2 { flex: 0 0 84px; }
-  .field-comp { flex: 1 1 150px; min-width: 130px; }
-  .moebel-prices-inline {
-    display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
-    white-space: nowrap; padding-bottom: 2px; margin-left: auto;
+  .detail-field-inline {
+    display: inline-flex; align-items: center; gap: 8px;
   }
-  .moebel-prices-inline .sub {
-    font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums;
-    display: flex; gap: 6px; align-items: baseline;
+  .detail-label-inline {
+    font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap;
+    min-width: 70px;
   }
-  .moebel-prices-inline .plabel {
-    font-size: 10px; color: var(--muted-soft); text-transform: uppercase;
-    letter-spacing: 0.04em; font-weight: 600;
+  .detail-field-inline select,
+  .detail-field-inline input { width: auto; min-width: 120px; }
+  .detail-field-inline input[type="number"] { width: 90px; text-align: left; }
+  .comp-rows { display: flex; flex-direction: column; gap: 1px; }
+  .comp-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0;
   }
+  .comp-row-label {
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    white-space: nowrap; min-width: 70px;
+  }
+  .comp-row select { flex: 1; max-width: 280px; }
+  .comp-row-price {
+    font-size: 14px; font-weight: 700; color: var(--ink);
+    font-variant-numeric: tabular-nums; margin-left: auto; white-space: nowrap;
+  }
+
+  /* ---- Möbel footer (delete button) ---- */
+  .moebel-footer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 4px;
+  }
+  .del-moebel-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: none; background: none; cursor: pointer;
+    font: inherit; font-size: 12px; color: var(--muted-soft);
+    padding: 4px 4px 4px 8px; border-radius: var(--radius-sm); line-height: 1;
+    transition: color 0.12s, background 0.12s;
+  }
+  .del-moebel-btn:hover { color: #dc2626; background: #fef2f2; }
+  .del-moebel-btn svg { width: 14px; height: 14px; }
 
   /* ---- Zusätze ---- */
   .zusatz-list {
-    margin-top: 12px; padding: 10px 12px 12px;
-    background: var(--accent-soft); border-radius: var(--radius-sm);
-    border: 1px solid var(--line);
+    margin-top: 8px;
   }
   .zusatz-head {
     display: grid; grid-template-columns: minmax(150px,1.4fr) minmax(96px,120px) 96px 24px;
-    gap: 9px; align-items: center; padding: 0 0 6px;
-    border-bottom: 1px solid var(--line); margin-bottom: 4px;
+    gap: 9px; align-items: center; padding: 0 0 4px;
   }
   .zusatz-head span {
     font-size: 9px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.08em; color: var(--muted);
   }
   .zusatz-head .sum-head { text-align: right; }
+  .zusatz-head .menge-head { text-align: right; }
   .zusatz-row {
     display: grid; grid-template-columns: minmax(150px,1.4fr) minmax(96px,120px) 96px 24px;
-    gap: 9px; align-items: center; padding: 4px 0;
+    gap: 9px; align-items: center; padding: 1px 0;
   }
-  .zusatz-row select, .zusatz-row input { background: #fff; }
-  .menge-wrap { display: flex; align-items: baseline; gap: 6px; }
-  .menge-wrap input { width: 70px; padding: 5px 6px; font-size: 13px; }
+  .menge-wrap { display: flex; align-items: baseline; gap: 6px; justify-content: flex-end; }
+  .menge-wrap input { width: 70px; padding: 5px 6px; font-size: 13px; text-align: right; }
   .menge-wrap .einheit-suffix { font-size: 11px; color: var(--muted-soft); white-space: nowrap; }
   .zusatz-row .sum {
     font-weight: 700; font-size: 13px; text-align: right;
     font-variant-numeric: tabular-nums; color: var(--ink);
   }
   .add-zusatz-btn {
-    margin-top: 6px; background: none; border: 1px dashed var(--line-strong);
-    border-radius: var(--radius-sm); color: var(--muted);
-    font: inherit; font-size: 12px; cursor: pointer; padding: 6px 10px; width: 100%;
-    transition: border-color 0.12s, color 0.12s, background 0.12s;
+    margin-top: 4px; background: none; border: none;
+    color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; padding: 2px 0 2px 8px;
+    border-radius: var(--radius-sm); transition: color 0.12s, background 0.12s, padding 0.12s;
   }
-  .add-zusatz-btn:hover { color: var(--accent); border-color: var(--accent); background: #fff; }
+  .add-zusatz-btn:hover { color: var(--accent); background: var(--accent-soft); padding-right: 8px; }
 
   /* ---- Delete × ---- */
   .del-x {
     width: 26px; height: 26px; padding: 0; justify-content: center;
     border: 1px solid transparent; background: none; color: var(--muted-soft);
-    cursor: pointer; border-radius: 6px; font-size: 16px; line-height: 1;
+    cursor: pointer; border-radius: 6px; line-height: 1;
     display: inline-flex; align-items: center; transition: all 0.12s;
     flex-shrink: 0;
   }
+  .del-x svg { width: 14px; height: 14px; display: block; }
   .del-x:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
 
   /* ---- Collapse toggle ---- */
@@ -311,8 +337,6 @@
     flex-shrink: 0; user-select: none;
   }
   .collapse-btn:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--line); }
-  .moebel-row.eingeklappt .moebel-detail,
-  .moebel-row.eingeklappt .zusatz-list { display: none; }
   .typ-block.eingeklappt .typ-section { display: none; }
 
   /* ---- Add Möbel button ---- */
@@ -360,23 +384,35 @@
     font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1.1;
   }
   .summary-tools {
-    margin-top: 16px; padding-top: 16px;
-    border-top: 1px solid var(--line);
-    display: flex; gap: 8px; flex-wrap: wrap; width: 100%;
+    display: flex; gap: 8px; flex-wrap: wrap; margin-right: auto;
   }
+
+  /* ---- Card footer (project delete) ---- */
+  .card-footer {
+    display: flex; justify-content: flex-end; margin-top: 16px;
+  }
+  .del-project-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: none; background: none; cursor: pointer;
+    font: inherit; font-size: 12px; color: var(--muted-soft);
+    padding: 4px 8px; border-radius: var(--radius-sm); line-height: 1;
+    transition: color 0.12s, background 0.12s;
+  }
+  .del-project-btn:hover { color: #dc2626; background: #fef2f2; }
+  .del-project-btn svg { width: 14px; height: 14px; }
 
   /* ---- Config panel (project-local Möbeltypen editor) ---- */
   .config-panel {
-    margin-top: 32px;
+    margin-bottom: 22px;
     border: 1px solid var(--line); border-radius: var(--radius);
-    overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm);
+    overflow: hidden; background: var(--surface);
   }
   .config-panel-head {
     padding: 14px 20px; background: var(--accent-soft);
-    border-bottom: 1px solid var(--line);
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
     cursor: pointer; user-select: none;
   }
+  .config-panel.open > .config-panel-head { border-bottom: 1px solid var(--line); }
   .config-panel-head h2 {
     margin: 0; color: var(--accent); font-size: 11px;
     text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;
@@ -448,10 +484,12 @@
     margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em;
   }
   .modal input {
-    width: 100%; padding: 11px 12px; border: 1px solid var(--line-strong);
-    border-radius: var(--radius-sm); font: inherit; font-size: 15px; background: #fff; color: var(--fg);
+    width: 100%; padding: 11px 12px; border: 1px solid transparent;
+    border-radius: var(--radius-sm); font: inherit; font-size: 15px; background: transparent; color: var(--fg);
+    transition: border-color 0.12s, background 0.12s, box-shadow 0.12s;
   }
-  .modal input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
+  .modal input:hover { border-color: var(--line-strong); background-color: #fff; }
+  .modal input:focus { outline: none; border-color: var(--accent); background-color: #fff; box-shadow: 0 0 0 3px rgba(51,65,85,0.10); }
   .modal-actions { display: flex; gap: 8px; margin-top: 22px; justify-content: flex-end; flex-wrap: wrap; }
 
   .scrim {
@@ -470,27 +508,30 @@
     .main { margin-left: 0; padding: 12px; }
     .card { padding: 18px 16px 24px; border-radius: 12px; }
     .card-head { flex-wrap: wrap; }
-    .projekt-name { font-size: 19px; }
+    input.projekt-name { font-size: 22px; }
     .endpreis-val { font-size: 22px; }
   }
   @media (max-width: 560px) {
     .summary { gap: 20px; }
     .summary .cell.final .val { font-size: 22px; }
     .moebel-top .typ-field { flex: 1 1 100%; }
+    .detail-first-line { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .comp-row { flex-wrap: wrap; }
+    .comp-row select { max-width: none; }
   }
 
   /* ---- Print ---- */
   @media print {
-    .sidebar, .scrim, .menu-btn, .add-moebel-btn, .add-zusatz-btn, .del-x,
-    .config-panel, .summary-tools, .moebel-prices-inline, .settings-view, .empty-state { display: none !important; }
+    .sidebar, .scrim, .menu-btn, .add-moebel-btn, .add-zusatz-btn, .del-x, .del-moebel-btn, .del-project-btn,
+    .config-panel, .summary-tools, .settings-view, .empty-state { display: none !important; }
     body { background: #fff; }
     .main { margin-left: 0; padding: 0; }
     .card { box-shadow: none; border: none; border-radius: 0; }
     .moebel-row { box-shadow: none; border-color: #cbd5e1; }
-    .bez-input { border: none; padding: 0; }
+    input.bez-input { border: none; padding: 0; }
+    input, select { border: none !important; background: none !important; box-shadow: none !important; }
+    select { background-image: none !important; padding-right: 8px; }
     .collapse-btn { display: none !important; }
-    .moebel-row.eingeklappt .moebel-detail,
-    .moebel-row.eingeklappt .zusatz-list { display: revert !important; }
   }
 </style>
 </head>
@@ -527,14 +568,7 @@
           <span class="endpreis-label">Endpreis brutto</span>
           <span class="endpreis-val" id="tEndpreisHeader">0,00 &euro;</span>
         </div>
-        <button class="btn sm" id="deleteProjectBtn" title="Projekt löschen">Löschen</button>
       </div>
-
-      <section>
-        <h2>M&ouml;bel <span class="count" id="moebelCount"></span></h2>
-        <div class="moebel-list" id="moebelList"></div>
-        <button class="add-moebel-btn" id="addMoebelBtn">+ M&ouml;bel hinzuf&uuml;gen</button>
-      </section>
 
       <div class="config-panel">
         <div class="config-panel-head" id="configToggle">
@@ -547,7 +581,16 @@
         </div>
       </div>
 
+      <section>
+        <h2>M&ouml;bel <span class="count" id="moebelCount"></span></h2>
+        <div class="moebel-list" id="moebelList"></div>
+        <button class="add-moebel-btn" id="addMoebelBtn">+ M&ouml;bel hinzuf&uuml;gen</button>
+      </section>
+
       <div class="summary">
+        <div class="summary-tools">
+          <button class="btn primary" id="printPdfBtn">PDF</button>
+        </div>
         <div class="cell">
           <label>Netto</label>
           <div class="val" id="tNetto">0,00 &euro;</div>
@@ -560,9 +603,12 @@
           <label>Endpreis brutto</label>
           <div class="val" id="tEndpreis">0,00 &euro;</div>
         </div>
-        <div class="summary-tools">
-          <button class="btn primary" id="printPdfBtn">PDF</button>
-        </div>
+      </div>
+      <div class="card-footer">
+        <button class="del-project-btn" id="deleteProjectBtn" title="Projekt löschen">
+          <span id="delProjectLabel">Projekt</span> löschen
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
       </div>
     </div>
 
@@ -861,8 +907,7 @@
       komponenten: komponenten,
       zusaetze: Array.isArray(m.zusaetze)
         ? m.zusaetze.map(z => ({ id: z.id || uid(), name: String(z.name || ""), menge: Number(z.menge) || 0 }))
-        : [],
-      eingeklappt: !!m.eingeklappt
+        : []
     };
   }
 
@@ -977,7 +1022,6 @@
     const row = document.createElement("div");
     row.className = "moebel-row";
     row.dataset.id = m.id;
-    if (m.eingeklappt) row.classList.add("eingeklappt");
 
     const typen = projektTypen();
     const typeOpts = typen.map(t =>
@@ -987,40 +1031,35 @@
       ? `<select data-f="typId">${typeOpts}</select>`
       : `<select data-f="typId"><option value="" selected>— Typ fehlt —</option>${typeOpts}</select>`;
 
-    const compFields = typ
+    const compRows = typ
       ? (typ.komponenten || []).map(comp =>
-          `<div class="detail-field field-comp">
-             <div class="detail-label">${escapeHtml(comp.name)}</div>
+          `<div class="comp-row">
+             <span class="comp-row-label">${escapeHtml(comp.name)}:</span>
              ${componentSelect(comp, m.komponenten ? m.komponenten[comp.name] : null)}
+             <span class="comp-row-price" data-v="compSum" data-comp="${escapeHtml(comp.name)}">${fmt(c.komponenten[comp.name] || 0)}</span>
            </div>`
-        ).join("")
-      : "";
-
-    const priceLines = typ
-      ? (typ.komponenten || []).map(comp =>
-          `<span class="sub"><span class="plabel">${escapeHtml(comp.name)}</span>
-           <span data-v="compSum" data-comp="${escapeHtml(comp.name)}">${fmt(c.komponenten[comp.name] || 0)}</span></span>`
         ).join("")
       : "";
 
     row.innerHTML = `
       <div class="moebel-top">
-        <button class="collapse-btn" data-act="toggle-collapse" title="${m.eingeklappt ? "Aufklappen" : "Einklappen"}">${m.eingeklappt ? "&#9656;" : "&#9662;"}</button>
         <input type="text" class="bez-input" data-f="bezeichnung" value="${escapeHtml(m.bezeichnung)}" placeholder="Bezeichnung">
-        <div class="typ-field"><div class="detail-label">Typ</div>${typSelect}</div>
         <div class="gesamtpreis">
           <span class="glabel">Gesamt</span>
           <span class="gval" data-v="gesamt">${fmt(c.gesamt)}</span>
         </div>
-        <button class="del-x" data-act="del-moebel" title="Möbel löschen">&times;</button>
       </div>
       <div class="moebel-detail">
-        <div class="detail-field field-m2">
-          <div class="detail-label">m²</div>
-          <input type="number" data-f="qm" step="0.01" min="0" value="${m.qm}">
+        <div class="detail-first-line">
+          <div class="detail-field detail-field-inline">
+            <span class="detail-label-inline">Typ:</span> ${typSelect}
+          </div>
+          <div class="detail-field detail-field-inline">
+            <span class="detail-label-inline">m²:</span>
+            <input type="number" data-f="qm" step="0.01" min="0" value="${m.qm}">
+          </div>
         </div>
-        ${compFields}
-        <div class="moebel-prices-inline">${priceLines}</div>
+        <div class="comp-rows">${compRows}</div>
       </div>
       <div class="zusatz-list" data-v="zusaetze"></div>
     `;
@@ -1034,13 +1073,16 @@
     }
 
     const zusatzContainer = row.querySelector('[data-v="zusaetze"]');
-    if (typ && (typ.zusaetze || []).length) {
+    const hasZusaetze = (m.zusaetze || []).length > 0;
+    if (hasZusaetze) {
       const head = document.createElement("div");
       head.className = "zusatz-head";
-      head.innerHTML = `<span>Zusatz</span><span>Menge</span><span class="sum-head">Summe</span><span></span>`;
+      head.innerHTML = `<span>Zusatz</span><span class="menge-head">Menge</span><span class="sum-head">Summe</span><span></span>`;
       zusatzContainer.appendChild(head);
     }
     (m.zusaetze || []).forEach(z => zusatzContainer.appendChild(renderZusatzRow(z, m)));
+    const footerRow = document.createElement("div");
+    footerRow.className = "moebel-footer-row";
     if (typ && (typ.zusaetze || []).length) {
       const addBtn = document.createElement("button");
       addBtn.className = "add-zusatz-btn";
@@ -1053,8 +1095,14 @@
         renderMoebel();
         focusZusatzField(m.id, z.id);
       });
-      zusatzContainer.appendChild(addBtn);
+      footerRow.appendChild(addBtn);
     }
+    const delBtn = document.createElement("button");
+    delBtn.className = "del-moebel-btn";
+    delBtn.setAttribute("data-act", "del-moebel");
+    delBtn.innerHTML = `<span class="del-moebel-text">${escapeHtml(m.bezeichnung || "Möbel")} löschen</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+    footerRow.appendChild(delBtn);
+    zusatzContainer.appendChild(footerRow);
 
     row.querySelectorAll("input, select").forEach(el => {
       el.addEventListener("input", onMoebelInput);
@@ -1066,14 +1114,6 @@
       p.moebel = p.moebel.filter(x => x.id !== m.id);
       saveProject();
       renderMoebel();
-    });
-    row.querySelector('[data-act="toggle-collapse"]').addEventListener("click", () => {
-      m.eingeklappt = !m.eingeklappt;
-      row.classList.toggle("eingeklappt", m.eingeklappt);
-      const btn = row.querySelector('[data-act="toggle-collapse"]');
-      btn.innerHTML = m.eingeklappt ? "&#9656;" : "&#9662;";
-      btn.title = m.eingeklappt ? "Aufklappen" : "Einklappen";
-      saveProject();
     });
     return row;
   }
@@ -1108,7 +1148,7 @@
         <span class="einheit-suffix" data-zv="einheit">${escapeHtml(einheit)}</span>
       </div>
       <div class="sum" data-zv="summe">${fmt(summe)}</div>
-      <button class="del-x" data-zact="del" title="Zusatz löschen">&times;</button>
+      <button class="del-x" data-zact="del" title="Zusatz löschen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
     `;
 
     row.querySelectorAll("input, select").forEach(el => {
@@ -1224,6 +1264,8 @@
     const p = activeProject();
     el.value = p ? (p.name || "") : "";
     el.disabled = !p;
+    const lbl = document.getElementById("delProjectLabel");
+    if (lbl) lbl.textContent = p ? (p.name || "Projekt") : "Projekt";
   }
 
   function renderMwstLabel() {
@@ -1352,7 +1394,7 @@
     });
     const delBtn = document.createElement("button");
     delBtn.className = "del-x";
-    delBtn.innerHTML = "&times;";
+    delBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
     delBtn.title = "Typ löschen";
     delBtn.addEventListener("click", () => {
       if (!confirm(`Möbeltyp „${typ.name || ""}“ löschen?`)) return;
@@ -1421,7 +1463,7 @@
     });
     const delBtn = document.createElement("button");
     delBtn.className = "del-x";
-    delBtn.innerHTML = "&times;";
+    delBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
     delBtn.title = "Komponente löschen";
     delBtn.addEventListener("click", () => {
       typ.komponenten = typ.komponenten.filter(c => c !== comp);
@@ -1473,7 +1515,7 @@
     });
     const delBtn = document.createElement("button");
     delBtn.className = "del-x";
-    delBtn.innerHTML = "&times;";
+    delBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
     delBtn.title = "Option löschen";
     delBtn.addEventListener("click", () => {
       comp.optionen = comp.optionen.filter(o => o !== opt);
@@ -1526,7 +1568,7 @@
     });
     const delBtn = document.createElement("button");
     delBtn.className = "del-x";
-    delBtn.innerHTML = "&times;";
+    delBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
     delBtn.title = "Zusatz löschen";
     delBtn.addEventListener("click", () => {
       typ.zusaetze = typ.zusaetze.filter(x => x !== z);
@@ -1749,14 +1791,18 @@
       p.name = e.target.value;
       saveProject();
       renderProjectList();
+      const lbl = document.getElementById("delProjectLabel");
+      if (lbl) lbl.textContent = p.name || "Projekt";
     });
 
     const configToggle = document.getElementById("configToggle");
     const configBody = document.getElementById("configBody");
     const configHint = document.getElementById("configHint");
+    const configPanel = configToggle.closest(".config-panel");
     configToggle.addEventListener("click", () => {
       const open = configBody.style.display !== "none";
       configBody.style.display = open ? "none" : "block";
+      configPanel.classList.toggle("open", !open);
       configHint.innerHTML = open ? "anzeigen &#9662;" : "ausblenden &#9654;";
     });
 
