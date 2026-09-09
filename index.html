@@ -520,18 +520,126 @@
     .comp-row select { max-width: none; }
   }
 
+  .settings-section-title {
+    font-size: 16px; font-weight: 700; color: var(--ink);
+    margin: 32px 0 12px; letter-spacing: -0.01em;
+  }
+  .settings-section-title:first-child { margin-top: 0; }
+  .settings-section-title .config-sub {
+    font-weight: 500; color: var(--muted-soft); font-size: 13px;
+  }
+  .settings-body { max-width: 680px; }
+  .settings-body > * { max-width: none; margin-left: 0; margin-right: 0; }
+  #settingsView .card-head { max-width: 680px; }
+
+  /* ---- Company settings form ---- */
+  .company-form {
+    display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px;
+  }
+  .company-form .field { display: flex; flex-direction: column; gap: 4px; }
+  .company-form label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+  }
+  .company-form input, .company-form textarea {
+    padding: 7px 9px; border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm); font: inherit; font-size: 13px;
+    background: #fff; color: var(--fg); width: 100%;
+  }
+  .company-form input:focus, .company-form textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(51,65,85,0.10);
+  }
+  .company-logo-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .company-logo-row img {
+    height: 64px; width: auto; max-width: 200px; object-fit: contain;
+    border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 4px 8px;
+  }
+  .company-logo-actions { display: flex; flex-direction: column; gap: 6px; }
+  .company-logo-actions .btn { font-size: 12px; }
+  .logo-upload-btn {
+    position: relative; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .logo-upload-btn input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+
+  /* ---- Quote (print only; hidden on screen) ---- */
+  .quote { display: none; }
+  .quote {
+    color: #0f172a; font-size: 11px; line-height: 1.45;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    position: relative; min-height: calc(100vh - 28mm);
+  }
+  .quote .q-content { padding-bottom: 0; }
+  .quote .q-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding-bottom: 12px; margin-bottom: 14px;
+    border-bottom: 2px solid #0f172a;
+  }
+  .quote .q-co { text-align: right; }
+  .quote .q-co-name { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+  .quote .q-co img { display: block; max-height: 56px; width: auto; margin-bottom: 6px; margin-left: auto; }
+  .quote .q-co-info { font-size: 10px; color: #475569; line-height: 1.5; }
+  .quote .q-title h1 {
+    margin: 0; font-size: 26px; font-weight: 800;
+    letter-spacing: -0.02em; color: #0f172a;
+  }
+  .quote .q-title .q-nr { font-size: 11px; color: #475569; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .quote .q-title .q-date { font-size: 11px; color: #475569; font-variant-numeric: tabular-nums; }
+  .quote .q-subject { font-size: 12px; font-weight: 700; color: #0f172a; margin-top: 6px; }
+
+  .quote table.q-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 14px 0 0; }
+  .quote table.q-table th, .quote table.q-table td {
+    padding: 5px 7px; vertical-align: top; text-align: left;
+  }
+  .quote table.q-table thead th {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #475569;
+    border-bottom: 1px solid #0f172a; padding-bottom: 5px;
+  }
+  .quote table.q-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .quote table.q-table tbody tr.q-main td { font-weight: 700; padding-top: 8px; }
+  .quote table.q-table tbody tr.q-sub td { color: #475569; font-weight: 400; }
+  .quote table.q-table tbody tr.q-sub td.q-sub-desc { padding-left: 16px; }
+  .quote table.q-table tbody tr.q-div td { padding: 0; border: 0; }
+  .quote table.q-table tbody tr.q-div td .q-rule { border-top: 1.5px solid #0f172a; height: 0; margin: 0; }
+  .quote table.q-table .q-pos { width: 22px; color: #94a3b8; }
+  .quote table.q-table .q-mat { color: #475569; font-weight: 400; }
+  .quote table.q-table .q-sum { font-weight: 600; }
+  .quote table.q-table tbody tr.q-main td.q-sum { font-weight: 800; }
+
+  .quote .q-totals { margin-top: 14px; margin-left: auto; width: 280px; }
+  .quote .q-totals .q-trow {
+    display: flex; justify-content: space-between; padding: 4px 0;
+    font-size: 11px; font-variant-numeric: tabular-nums;
+  }
+  .quote .q-totals .q-trow.q-final {
+    border-top: 1px solid #0f172a; margin-top: 4px; padding-top: 8px;
+    font-size: 14px; font-weight: 800;
+  }
+  .quote .q-top-total {
+    display: flex; justify-content: flex-end; align-items: center; gap: 32px;
+    padding: 0 2px 12px; margin-bottom: 16px;
+    border-bottom: 1.5px solid #0f172a;
+  }
+  .quote .q-top-total .q-tt-block { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .quote .q-top-total .q-tt-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #475569; }
+  .quote .q-top-total .q-tt-value { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .quote .q-top-total .q-tt-final { align-items: flex-end; }
+  .quote .q-top-total .q-tt-final .q-tt-label { color: #0f172a; }
+  .quote .q-top-total .q-tt-final .q-tt-value { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+
   /* ---- Print ---- */
   @media print {
     .sidebar, .scrim, .menu-btn, .add-moebel-btn, .add-zusatz-btn, .del-x, .del-moebel-btn, .del-project-btn,
-    .config-panel, .summary-tools, .settings-view, .empty-state { display: none !important; }
-    body { background: #fff; }
-    .main { margin-left: 0; padding: 0; }
-    .card { box-shadow: none; border: none; border-radius: 0; }
-    .moebel-row { box-shadow: none; border-color: #cbd5e1; }
-    input.bez-input { border: none; padding: 0; }
-    input, select { border: none !important; background: none !important; box-shadow: none !important; }
-    select { background-image: none !important; padding-right: 8px; }
-    .collapse-btn { display: none !important; }
+    .config-panel, .summary-tools, .settings-view, .empty-state,
+    #projectView, #settingsView, #emptyView { display: none !important; }
+    .quote { display: block !important; }
+    html, body { background: #fff; height: auto; min-height: 0; }
+    .app { display: block; min-height: 0; }
+    .main { display: block; margin: 0; padding: 0; height: auto; min-height: 0; overflow: visible; }
+    @page { margin: 14mm; }
   }
 </style>
 </head>
@@ -619,13 +727,20 @@
           <button class="menu-btn" id="menuBtn2" title="Menü">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
-          <button class="btn sm" id="settingsBackBtn">&larr; Zur&uuml;ck</button>
-          <span class="settings-title">Einstellungen &mdash; M&ouml;beltypen</span>
+          <span class="settings-title">Einstellungen</span>
         </div>
       </div>
-      <p class="hint">Diese Typen sind die Vorlage f&uuml;r neue Projekte. Jedes Projekt erh&auml;lt bei der Erstellung eine eigene Kopie, die sich dann pro Projekt anpassen l&auml;sst. &Auml;nderungen hier wirken sich nicht auf bestehende Projekte aus.</p>
-      <div id="typEditGlobal"></div>
+      <div class="settings-body">
+        <h2 class="settings-section-title">Firmenangaben <span class="config-sub">(f&uuml;r das Angebot-PDF)</span></h2>
+        <div id="companyFormFields"></div>
+        <h2 class="settings-section-title">M&ouml;beltypen</h2>
+        <p class="hint">Diese Typen sind die Vorlage f&uuml;r neue Projekte. Jedes Projekt erh&auml;lt bei der Erstellung eine eigene Kopie, die sich dann pro Projekt anpassen l&auml;sst. &Auml;nderungen hier wirken sich nicht auf bestehende Projekte aus.</p>
+        <div id="typEditGlobal"></div>
+      </div>
     </div>
+
+    <!-- Quote (print only) -->
+    <section class="quote" id="quoteDoc"></section>
 
     <!-- Empty state -->
     <div class="card empty-state" id="emptyView" style="display:none">
@@ -755,13 +870,21 @@
   const STORAGE_PROJECTS = "mortise.projects";
   const STORAGE_ACTIVE = "mortise.activeProjectId";
   const STORAGE_TYP_COLLAPSE = "mortise.typCollapse";
+  const STORAGE_COMPANY = "mortise.company";
   const LEGACY_PROJECT = "mortise.project";
+
+  const defaultCompany = {
+    adresse: "Werkstattweg 4, 8010 Graz",
+    kontakt: "+43 680 1234567 · kontakt@muster-schreinerei.at",
+    logo: ""
+  };
 
   let globalTypen = [];
   let projects = [];
   let activeProjectId = null;
   let view = "project";
   let eingeklappteTypen = new Set();
+  let company = JSON.parse(JSON.stringify(defaultCompany));
 
   function uid() {
     return "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -789,6 +912,11 @@
   function saveCatalog() { saveJSON(STORAGE_CATALOG, globalTypen); renderStorageInfo(); }
   function saveProjects() { saveJSON(STORAGE_PROJECTS, projects); renderStorageInfo(); }
   function saveActive() { saveJSON(STORAGE_ACTIVE, activeProjectId || ""); }
+  function saveCompany() { saveJSON(STORAGE_COMPANY, company); renderStorageInfo(); }
+  function loadCompany() {
+    const saved = loadJSON(STORAGE_COMPANY);
+    if (saved && typeof saved === "object") company = Object.assign({}, defaultCompany, saved);
+  }
   function saveProject() { saveProjects(); saveActive(); }
   function saveTypCollapse() { saveJSON(STORAGE_TYP_COLLAPSE, Array.from(eingeklappteTypen)); }
   function loadTypCollapse() {
@@ -798,7 +926,7 @@
 
   function storageBytes() {
     let total = 0;
-    [STORAGE_CATALOG, STORAGE_PROJECTS, STORAGE_ACTIVE, STORAGE_TYP_COLLAPSE].forEach(k => {
+    [STORAGE_CATALOG, STORAGE_PROJECTS, STORAGE_ACTIVE, STORAGE_TYP_COLLAPSE, STORAGE_COMPANY].forEach(k => {
       const v = localStorage.getItem(k);
       if (v) total += v.length + k.length;
     });
@@ -1278,7 +1406,7 @@
     list.innerHTML = "";
     projects.forEach(p => {
       const item = document.createElement("div");
-      item.className = "project-item" + (p.id === activeProjectId ? " active" : "");
+      item.className = "project-item" + (p.id === activeProjectId && view !== "settings" ? " active" : "");
       item.dataset.id = p.id;
       const name = document.createElement("span");
       name.className = "pname";
@@ -1301,6 +1429,7 @@
     document.getElementById("settingsView").style.display = v === "settings" ? "" : "none";
     document.getElementById("emptyView").style.display = v === "empty" ? "" : "none";
     document.getElementById("settingsBtn").classList.toggle("active", v === "settings");
+    renderProjectList();
     closeSidebar();
   }
 
@@ -1684,12 +1813,186 @@
     showView("project");
   }
 
+  function renderCompanyForm() {
+    const wrap = document.getElementById("companyFormFields");
+    if (!wrap) return;
+    const f = (key, label) => {
+      const div = document.createElement("div");
+      div.className = "field";
+      const lbl = document.createElement("label");
+      lbl.textContent = label;
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.value = company[key] || "";
+      inp.addEventListener("input", () => { company[key] = inp.value; saveCompany(); });
+      div.appendChild(lbl); div.appendChild(inp);
+      return div;
+    };
+    wrap.innerHTML = "";
+    const form = document.createElement("div");
+    form.className = "company-form";
+
+    const logoWrap = document.createElement("div");
+    logoWrap.className = "field";
+    logoWrap.innerHTML = '<label>Logo</label>';
+    const logoRow = document.createElement("div");
+    logoRow.className = "company-logo-row";
+    const actions = document.createElement("div");
+    actions.className = "company-logo-actions";
+    if (company.logo) {
+      const img = document.createElement("img");
+      img.src = company.logo;
+      logoRow.appendChild(img);
+      const replaceBtn = document.createElement("label");
+      replaceBtn.className = "btn sm logo-upload-btn";
+      replaceBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Ersetzen';
+      const replaceInput = document.createElement("input");
+      replaceInput.type = "file";
+      replaceInput.accept = "image/*";
+      replaceInput.addEventListener("change", () => {
+        const file = replaceInput.files && replaceInput.files[0];
+        if (!file) return;
+        if (file.size > 600000) { alert("Bitte ein kleineres Logo (max. ~600 KB) wählen — es wird lokal gespeichert."); return; }
+        const reader = new FileReader();
+        reader.onload = () => { company.logo = String(reader.result || ""); saveCompany(); renderCompanyForm(); };
+        reader.readAsDataURL(file);
+      });
+      replaceBtn.appendChild(replaceInput);
+      actions.appendChild(replaceBtn);
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn sm";
+      delBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> Entfernen';
+      delBtn.addEventListener("click", () => { company.logo = ""; saveCompany(); renderCompanyForm(); });
+      actions.appendChild(delBtn);
+    } else {
+      const uploadBtn = document.createElement("label");
+      uploadBtn.className = "btn sm logo-upload-btn";
+      uploadBtn.textContent = "+ Logo hochladen";
+      const uploadInput = document.createElement("input");
+      uploadInput.type = "file";
+      uploadInput.accept = "image/*";
+      uploadInput.addEventListener("change", () => {
+        const file = uploadInput.files && uploadInput.files[0];
+        if (!file) return;
+        if (file.size > 600000) { alert("Bitte ein kleineres Logo (max. ~600 KB) wählen — es wird lokal gespeichert."); return; }
+        const reader = new FileReader();
+        reader.onload = () => { company.logo = String(reader.result || ""); saveCompany(); renderCompanyForm(); };
+        reader.readAsDataURL(file);
+      });
+      uploadBtn.appendChild(uploadInput);
+      actions.appendChild(uploadBtn);
+    }
+    logoRow.appendChild(actions);
+    logoWrap.appendChild(logoRow);
+    form.appendChild(logoWrap);
+
+    form.appendChild(f("adresse", "Adresse"));
+    form.appendChild(f("kontakt", "Kontakt"));
+    wrap.appendChild(form);
+  }
+
+  function renderQuote() {
+    const p = activeProject();
+    const root = document.getElementById("quoteDoc");
+    if (!root) return;
+    if (!p) { root.innerHTML = ""; return; }
+    const r = calc();
+    p.moebel.forEach(m => calcMoebel(m));
+    const dateStr = new Date().toLocaleDateString("de-DE");
+    const ymd = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const nr = "ANG-" + ymd + "-" + String(p.id || "").slice(-4).toUpperCase();
+
+    const coInfo = [company.adresse, company.kontakt].filter(Boolean).join("<br>");
+    let rows = "";
+    p.moebel.forEach((m, i) => {
+      const typ = findTyp(m.typId);
+      const c = m._calc || calcMoebel(m);
+      const typName = typ ? escapeHtml(typ.name || typ.id) : "—";
+      const subRows = [];
+      (typ ? typ.komponenten : []).forEach(comp => {
+        const sel = m.komponenten ? m.komponenten[comp.name] : null;
+        const opt = findOption(comp, sel);
+        const preis = opt ? opt.preis : 0;
+        const summe = c.komponenten[comp.name] || 0;
+        const desc = escapeHtml(comp.name || "") + ": " + escapeHtml(sel || "—") + " (" + preis + " €/m²)";
+        subRows.push(`<tr class="q-sub"><td></td><td class="q-sub-desc" colspan="3">${desc}</td><td class="num q-sum">${fmt(summe)}</td></tr>`);
+      });
+      (m.zusaetze || []).forEach(z => {
+        const def = typ ? findZusatzDef(typ, z.name) : null;
+        const art = def ? def.mengeArt : "stueck";
+        const preis = def ? def.preis : 0;
+        const summe = z._summe || 0;
+        const einh = einheitForMengetArt(art);
+        let desc = "+ " + escapeHtml(z.name || "");
+        if (art === "pauschal") desc += " (" + fmt(preis) + ")";
+        else if (art === "flaeche") desc += " (" + preis + " €/m²)";
+        else desc += " (" + preis + " €/" + einh + ")";
+        if (art === "laenge" || art === "stueck") desc += " × " + (z.menge || 0).toLocaleString("de-DE");
+        subRows.push(`<tr class="q-sub"><td></td><td class="q-sub-desc" colspan="3">${desc}</td><td class="num q-sum">${fmt(summe)}</td></tr>`);
+      });
+      rows += `<tr class="q-main">
+        <td class="q-pos">${i + 1}</td>
+        <td>${escapeHtml(m.bezeichnung || "—")}</td>
+        <td>${typName}</td>
+        <td class="num">${(m.qm || 0).toLocaleString("de-DE", { minimumFractionDigits: 2 })}</td>
+        <td class="num q-sum">${fmt(c.gesamt)}</td>
+      </tr>`;
+      if (subRows.length) rows += subRows.join("");
+      rows += `<tr class="q-div"><td colspan="5"><div class="q-rule"></div></td></tr>`;
+    });
+
+    root.innerHTML = `
+      <div class="q-content">
+      <div class="q-head">
+        <div class="q-title">
+          <h1>Kostenvoranschlag</h1>
+          <div class="q-nr">Nr. ${escapeHtml(nr)}</div>
+          <div class="q-date">vom ${escapeHtml(dateStr)}</div>
+          <div class="q-subject">${escapeHtml(p.name || "")}</div>
+        </div>
+        <div class="q-co">
+          ${company.logo ? `<img src="${company.logo}" alt="">` : `<div class="q-co-name"></div>`}
+          <div class="q-co-info">${coInfo}</div>
+        </div>
+      </div>
+      <div class="q-top-total">
+        <div class="q-tt-block">
+          <span class="q-tt-label">Netto</span>
+          <span class="q-tt-value">${fmt(r.netto)}</span>
+        </div>
+        <div class="q-tt-block">
+          <span class="q-tt-label">MwSt. ${r.mwstPct}%</span>
+          <span class="q-tt-value">${fmt(r.mwstBetrag)}</span>
+        </div>
+        <div class="q-tt-block q-tt-final">
+          <span class="q-tt-label">Endpreis brutto</span>
+          <span class="q-tt-value">${fmt(r.endpreis)}</span>
+        </div>
+      </div>
+      <table class="q-table">
+        <thead>
+          <tr>
+            <th class="q-pos">Pos</th>
+            <th>Bezeichnung</th>
+            <th>Typ</th>
+            <th class="num">m²</th>
+            <th class="num">Summe</th>
+          </tr>
+        </thead>
+        <tbody>${rows || '<tr><td colspan="5">Keine Möbel</td></tr>'}</tbody>
+      </table>
+      </div>
+    `;
+  }
+
   function printPdf() {
-    alert("PDF-Export wird bald verfügbar sein.");
+    renderQuote();
+    window.print();
   }
 
   function openSettings() {
     renderGlobalTypeEditor();
+    renderCompanyForm();
     showView("settings");
   }
 
@@ -1745,6 +2048,7 @@
     globalTypen = Array.isArray(savedCat) ? savedCat.map(normalizeTyp) : JSON.parse(JSON.stringify(defaultMoebelTypen));
     saveCatalog();
     eingeklappteTypen = loadTypCollapse();
+    loadCompany();
 
     migrateLegacy();
     const savedActive = loadJSON(STORAGE_ACTIVE);
@@ -1764,6 +2068,7 @@
 
     document.getElementById("addMoebelBtn").addEventListener("click", addMoebel);
     document.getElementById("printPdfBtn").addEventListener("click", printPdf);
+    window.addEventListener("beforeprint", renderQuote);
     document.getElementById("deleteProjectBtn").addEventListener("click", () => {
       if (activeProjectId) deleteProject(activeProjectId);
     });
@@ -1781,9 +2086,6 @@
     });
 
     document.getElementById("settingsBtn").addEventListener("click", openSettings);
-    document.getElementById("settingsBackBtn").addEventListener("click", () => {
-      showView(activeProject() ? "project" : "empty");
-    });
 
     document.getElementById("projektNameInput").addEventListener("input", (e) => {
       const p = activeProject();
